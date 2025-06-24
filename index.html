@@ -203,6 +203,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
+            font-family: inherit;
         }
         
         .btn i {
@@ -268,6 +269,7 @@
             border-radius: var(--border-radius);
             font-size: 1rem;
             transition: border-color 0.3s ease;
+            font-family: inherit;
         }
         
         .form-control:focus {
@@ -461,6 +463,49 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Text utilities */
+        .text-center {
+            text-align: center;
+        }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        
+        .badge-primary {
+            color: #fff;
+            background-color: var(--primary-color);
+        }
+        
+        .badge-secondary {
+            color: #fff;
+            background-color: var(--gray-500);
+        }
+        
+        .badge-success {
+            color: #fff;
+            background-color: var(--success-color);
+        }
+        
+        .badge-danger {
+            color: #fff;
+            background-color: var(--danger-color);
+        }
+        
+        .badge-warning {
+            color: #212529;
+            background-color: var(--warning-color);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .nav-list {
@@ -519,7 +564,7 @@
                     로그인
                 </button>
                 
-                <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="showRegisterForm()">
+                <button type="button" class="btn btn-secondary" style="width: 100%;" id="registerButton">
                     <i class="fas fa-user-plus"></i>
                     회원가입
                 </button>
@@ -541,7 +586,7 @@
                     <div class="user-info">
                         <span id="userNickname">사용자</span>
                         <div class="user-avatar" id="userAvatar">U</div>
-                        <button class="btn btn-secondary btn-sm" onclick="logout()">
+                        <button class="btn btn-secondary btn-sm" id="logoutButton">
                             <i class="fas fa-sign-out-alt"></i>
                             로그아웃
                         </button>
@@ -555,31 +600,31 @@
             <div class="container">
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a class="nav-link active" onclick="showPage('dashboard')">
+                        <a class="nav-link active" data-page="dashboard">
                             <i class="fas fa-chart-line"></i>
                             대시보드
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" onclick="showPage('members')">
+                        <a class="nav-link" data-page="members">
                             <i class="fas fa-users"></i>
                             회원 관리
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" onclick="showPage('boss-records')">
+                        <a class="nav-link" data-page="boss-records">
                             <i class="fas fa-sword"></i>
                             보스 기록
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" onclick="showPage('statistics')">
+                        <a class="nav-link" data-page="statistics">
                             <i class="fas fa-chart-bar"></i>
                             통계
                         </a>
                     </li>
                     <li class="nav-item" id="adminNav" style="display: none;">
-                        <a class="nav-link" onclick="showPage('admin')">
+                        <a class="nav-link" data-page="admin">
                             <i class="fas fa-cog"></i>
                             관리자
                         </a>
@@ -627,7 +672,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">회원 관리</h2>
-                            <button class="btn btn-primary" onclick="openMemberModal()">
+                            <button class="btn btn-primary" id="addMemberButton">
                                 <i class="fas fa-plus"></i>
                                 회원 추가
                             </button>
@@ -665,7 +710,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">보스 참여 기록</h2>
-                            <button class="btn btn-primary" onclick="openBossRecordModal()">
+                            <button class="btn btn-primary" id="addBossRecordButton">
                                 <i class="fas fa-plus"></i>
                                 기록 추가
                             </button>
@@ -714,7 +759,7 @@
                             <div class="card">
                                 <h3>보스 관리</h3>
                                 <p>게임의 보스들을 추가, 수정, 삭제할 수 있습니다.</p>
-                                <button class="btn btn-primary" onclick="openBossManageModal()">
+                                <button class="btn btn-primary" id="manageBossButton">
                                     <i class="fas fa-dragon"></i>
                                     보스 관리
                                 </button>
@@ -723,7 +768,7 @@
                             <div class="card">
                                 <h3>직업 관리</h3>
                                 <p>게임의 직업/클래스를 관리할 수 있습니다.</p>
-                                <button class="btn btn-primary" onclick="openClassManageModal()">
+                                <button class="btn btn-primary" id="manageClassButton">
                                     <i class="fas fa-user-ninja"></i>
                                     직업 관리
                                 </button>
@@ -732,7 +777,7 @@
                             <div class="card">
                                 <h3>시스템 설정</h3>
                                 <p>게임 관련 설정을 변경할 수 있습니다.</p>
-                                <button class="btn btn-primary" onclick="openSystemSettingsModal()">
+                                <button class="btn btn-primary" id="systemSettingsButton">
                                     <i class="fas fa-cogs"></i>
                                     시스템 설정
                                 </button>
@@ -749,7 +794,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">회원 정보</h3>
-                <button class="modal-close" onclick="closeModal('memberModal')">&times;</button>
+                <button class="modal-close" data-modal="memberModal">&times;</button>
             </div>
             <form id="memberForm">
                 <div class="form-group">
@@ -769,7 +814,7 @@
                     </select>
                 </div>
                 <div style="text-align: right;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('memberModal')">취소</button>
+                    <button type="button" class="btn btn-secondary" data-modal="memberModal">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
                 </div>
             </form>
@@ -780,7 +825,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">보스 기록 추가</h3>
-                <button class="modal-close" onclick="closeModal('bossRecordModal')">&times;</button>
+                <button class="modal-close" data-modal="bossRecordModal">&times;</button>
             </div>
             <form id="bossRecordForm">
                 <div class="form-group">
@@ -804,107 +849,282 @@
                     <textarea class="form-control" id="recordNotes" rows="3"></textarea>
                 </div>
                 <div style="text-align: right;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('bossRecordModal')">취소</button>
+                    <button type="button" class="btn btn-secondary" data-modal="bossRecordModal">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <script>
-        // Global variables
-        let currentUser = null;
-        let currentPage = 'dashboard';
-        let membersData = [];
-        let bossRecordsData = [];
-        let bossListData = [];
+        // 전역 변수들 - eval 사용을 피하기 위해 직접 선언
+        var currentUser = null;
+        var currentPage = 'dashboard';
+        var membersData = [];
+        var bossRecordsData = [];
+        var bossListData = [];
+        var sessionToken = null;
         
-        // Utility functions
-        function showAlert(message, type = 'success') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
+        // 안전한 이벤트 리스너 설정 함수
+        function setupEventListeners() {
+            // 로그인 폼
+            var loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            // 회원가입 버튼
+            var registerButton = document.getElementById('registerButton');
+            if (registerButton) {
+                registerButton.addEventListener('click', showRegisterForm);
+            }
+            
+            // 로그아웃 버튼
+            var logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', logout);
+            }
+            
+            // 네비게이션 링크들
+            var navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var pageId = this.getAttribute('data-page');
+                    if (pageId) {
+                        showPage(pageId);
+                    }
+                });
+            });
+            
+            // 모달 닫기 버튼들
+            var modalCloses = document.querySelectorAll('.modal-close, [data-modal]');
+            modalCloses.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var modalId = this.getAttribute('data-modal');
+                    if (modalId) {
+                        closeModal(modalId);
+                    }
+                });
+            });
+            
+            // 모달 배경 클릭으로 닫기
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function(modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+            
+            // 페이지별 버튼들
+            setupPageButtons();
+            
+            // 검색 기능
+            var memberSearch = document.getElementById('memberSearch');
+            if (memberSearch) {
+                memberSearch.addEventListener('input', function(e) {
+                    var searchTerm = e.target.value.toLowerCase();
+                    var filteredMembers = membersData.filter(function(member) {
+                        return member.nickname.toLowerCase().includes(searchTerm) ||
+                               (member.email && member.email.toLowerCase().includes(searchTerm));
+                    });
+                    displayMembers(filteredMembers);
+                });
+            }
+        }
+        
+        function setupPageButtons() {
+            // 회원 추가 버튼
+            var addMemberButton = document.getElementById('addMemberButton');
+            if (addMemberButton) {
+                addMemberButton.addEventListener('click', function() {
+                    openMemberModal();
+                });
+            }
+            
+            // 보스 기록 추가 버튼
+            var addBossRecordButton = document.getElementById('addBossRecordButton');
+            if (addBossRecordButton) {
+                addBossRecordButton.addEventListener('click', function() {
+                    openBossRecordModal();
+                });
+            }
+            
+            // 관리자 페이지 버튼들
+            var manageBossButton = document.getElementById('manageBossButton');
+            if (manageBossButton) {
+                manageBossButton.addEventListener('click', function() {
+                    showAlert('보스 관리 기능은 준비 중입니다.', 'warning');
+                });
+            }
+            
+            var manageClassButton = document.getElementById('manageClassButton');
+            if (manageClassButton) {
+                manageClassButton.addEventListener('click', function() {
+                    showAlert('직업 관리 기능은 준비 중입니다.', 'warning');
+                });
+            }
+            
+            var systemSettingsButton = document.getElementById('systemSettingsButton');
+            if (systemSettingsButton) {
+                systemSettingsButton.addEventListener('click', function() {
+                    showAlert('시스템 설정 기능은 준비 중입니다.', 'warning');
+                });
+            }
+        }
+        
+        // 유틸리티 함수들
+        function showAlert(message, type) {
+            type = type || 'success';
+            var alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-' + type;
             alertDiv.textContent = message;
             
-            const container = document.querySelector('.container');
-            container.insertBefore(alertDiv, container.firstChild);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
+            var container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+                
+                setTimeout(function() {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 5000);
+            }
         }
         
         function formatDate(dateString) {
             if (!dateString) return '-';
-            const date = new Date(dateString);
+            var date = new Date(dateString);
             return date.toLocaleDateString('ko-KR');
         }
         
         function formatDateTime(dateString) {
             if (!dateString) return '-';
-            const date = new Date(dateString);
+            var date = new Date(dateString);
             return date.toLocaleString('ko-KR');
         }
         
-        // API calls
-        async function apiCall(action, data = {}) {
-            try {
-                const formData = new FormData();
-                formData.append('action', action);
-                formData.append('data', JSON.stringify(data));
-                
-                const response = await fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                return await response.json();
-            } catch (error) {
+        // API 호출 함수 - eval 제거
+        function apiCall(action, data, callback) {
+            data = data || {};
+            
+            // FormData 생성
+            var formData = new FormData();
+            formData.append('action', action);
+            formData.append('data', JSON.stringify(data));
+            
+            if (sessionToken) {
+                formData.append('sessionToken', sessionToken);
+            }
+            
+            // fetch 요청
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(result) {
+                if (callback) {
+                    callback(result);
+                }
+            })
+            .catch(function(error) {
                 console.error('API 호출 오류:', error);
                 showAlert('서버 오류가 발생했습니다.', 'danger');
-                return { success: false, error: error.message };
-            }
+                if (callback) {
+                    callback({ success: false, error: error.message });
+                }
+            });
         }
         
-        // Authentication
-        async function login(event) {
+        // 인증 관련 함수들
+        function handleLogin(event) {
             event.preventDefault();
             
-            const nickname = document.getElementById('loginNickname').value;
-            const password = document.getElementById('loginPassword').value;
+            var nickname = document.getElementById('loginNickname').value;
+            var password = document.getElementById('loginPassword').value;
             
-            const result = await apiCall('login', { nickname, password });
-            
-            if (result.success) {
-                currentUser = result.data.user;
-                sessionStorage.setItem('userSession', JSON.stringify(result.data.session));
-                showMainApp();
-                loadDashboard();
-            } else {
-                showAlert(result.message || '로그인에 실패했습니다.', 'danger');
-            }
+            apiCall('login', { nickname: nickname, password: password }, function(result) {
+                if (result.success) {
+                    currentUser = result.data.user;
+                    sessionToken = result.data.session.token;
+                    
+                    // 세션 저장
+                    try {
+                        sessionStorage.setItem('userSession', JSON.stringify(result.data.session));
+                        sessionStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                    } catch (e) {
+                        console.warn('세션 저장 실패:', e);
+                    }
+                    
+                    showMainApp();
+                    loadDashboard();
+                } else {
+                    showAlert(result.message || '로그인에 실패했습니다.', 'danger');
+                }
+            });
         }
         
         function logout() {
+            if (sessionToken) {
+                apiCall('logout', {}, function(result) {
+                    // 결과와 상관없이 로그아웃 처리
+                    finishLogout();
+                });
+            } else {
+                finishLogout();
+            }
+        }
+        
+        function finishLogout() {
             currentUser = null;
-            sessionStorage.removeItem('userSession');
+            sessionToken = null;
+            
+            // 세션 정리
+            try {
+                sessionStorage.removeItem('userSession');
+                sessionStorage.removeItem('currentUser');
+            } catch (e) {
+                console.warn('세션 정리 실패:', e);
+            }
+            
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('appContainer').style.display = 'none';
             
-            // Reset forms
-            document.getElementById('loginForm').reset();
+            // 폼 리셋
+            var loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.reset();
+            }
         }
         
         function showMainApp() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
             
-            // Update user info
-            document.getElementById('userNickname').textContent = currentUser.nickname;
-            document.getElementById('userAvatar').textContent = currentUser.nickname.charAt(0).toUpperCase();
-            
-            // Show admin nav if user is admin
-            if (currentUser.role === 'ADMIN' || currentUser.role === 'GUILD_MASTER') {
-                document.getElementById('adminNav').style.display = 'block';
+            // 사용자 정보 업데이트
+            if (currentUser) {
+                var userNickname = document.getElementById('userNickname');
+                var userAvatar = document.getElementById('userAvatar');
+                
+                if (userNickname) {
+                    userNickname.textContent = currentUser.nickname;
+                }
+                if (userAvatar) {
+                    userAvatar.textContent = currentUser.nickname.charAt(0).toUpperCase();
+                }
+                
+                // 관리자 네비게이션 표시
+                if (currentUser.role === 'ADMIN' || currentUser.role === 'GUILD_MASTER') {
+                    var adminNav = document.getElementById('adminNav');
+                    if (adminNav) {
+                        adminNav.style.display = 'block';
+                    }
+                }
             }
         }
         
@@ -912,27 +1132,35 @@
             showAlert('회원가입 기능은 관리자에게 문의하세요.', 'warning');
         }
         
-        // Navigation
+        // 네비게이션 함수들
         function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
+            // 모든 페이지 숨기기
+            var pages = document.querySelectorAll('.page');
+            pages.forEach(function(page) {
                 page.classList.remove('active');
             });
             
-            // Remove active class from nav links
-            document.querySelectorAll('.nav-link').forEach(link => {
+            // 모든 네비게이션 링크 비활성화
+            var navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(function(link) {
                 link.classList.remove('active');
             });
             
-            // Show selected page
-            document.getElementById(pageId + 'Page').classList.add('active');
+            // 선택된 페이지 표시
+            var targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
             
-            // Add active class to clicked nav link
-            event.target.classList.add('active');
+            // 해당 네비게이션 링크 활성화
+            var targetNav = document.querySelector('.nav-link[data-page="' + pageId + '"]');
+            if (targetNav) {
+                targetNav.classList.add('active');
+            }
             
             currentPage = pageId;
             
-            // Load page data
+            // 페이지별 데이터 로드
             switch (pageId) {
                 case 'dashboard':
                     loadDashboard();
@@ -952,99 +1180,110 @@
             }
         }
         
-        // Data loading functions
-        async function loadDashboard() {
-            try {
-                // Load statistics for dashboard
-                const membersResult = await apiCall('getMembers');
-                const recordsResult = await apiCall('getBossRecords');
-                
-                if (membersResult.success) {
-                    const data = membersResult.data;
-                    document.getElementById('totalMembers').textContent = data.totalCount;
-                    document.getElementById('activeMembers').textContent = 
-                        data.summary ? data.summary.activeMembers : 0;
-                }
-                
-                if (recordsResult.success) {
-                    document.getElementById('totalBossRecords').textContent = recordsResult.data.totalCount;
+        // 데이터 로딩 함수들
+        function loadDashboard() {
+            // 회원 통계 로드
+            apiCall('getMembers', {}, function(result) {
+                if (result.success) {
+                    var data = result.data;
+                    var totalMembersEl = document.getElementById('totalMembers');
+                    var activeMembersEl = document.getElementById('activeMembers');
                     
-                    // Calculate weekly participation
-                    const weeklyCount = recordsResult.data.records.filter(record => {
-                        const recordDate = new Date(record.recordDate);
-                        const weekAgo = new Date();
+                    if (totalMembersEl) {
+                        totalMembersEl.textContent = data.totalCount || 0;
+                    }
+                    if (activeMembersEl && data.summary) {
+                        activeMembersEl.textContent = data.summary.activeMembers || 0;
+                    }
+                }
+            });
+            
+            // 보스 기록 통계 로드
+            apiCall('getBossRecords', {}, function(result) {
+                if (result.success) {
+                    var totalRecordsEl = document.getElementById('totalBossRecords');
+                    var weeklyParticipationEl = document.getElementById('weeklyParticipation');
+                    
+                    if (totalRecordsEl) {
+                        totalRecordsEl.textContent = result.data.totalCount || 0;
+                    }
+                    
+                    // 주간 참여 계산
+                    if (weeklyParticipationEl && result.data.records) {
+                        var weekAgo = new Date();
                         weekAgo.setDate(weekAgo.getDate() - 7);
-                        return recordDate >= weekAgo;
-                    }).length;
+                        
+                        var weeklyCount = result.data.records.filter(function(record) {
+                            return new Date(record.recordDate) >= weekAgo;
+                        }).length;
+                        
+                        weeklyParticipationEl.textContent = weeklyCount;
+                    }
                     
-                    document.getElementById('weeklyParticipation').textContent = weeklyCount;
-                    
-                    // Show recent activity
-                    displayRecentActivity(recordsResult.data.records.slice(0, 5));
+                    // 최근 활동 표시
+                    if (result.data.records) {
+                        displayRecentActivity(result.data.records.slice(0, 5));
+                    }
                 }
-            } catch (error) {
-                console.error('대시보드 로딩 오류:', error);
-            }
+            });
         }
         
         function displayRecentActivity(records) {
-            const container = document.getElementById('recentActivity');
+            var container = document.getElementById('recentActivity');
+            if (!container) return;
             
             if (records.length === 0) {
                 container.innerHTML = '<p>최근 활동이 없습니다.</p>';
                 return;
             }
             
-            const html = records.map(record => `
-                <div style="padding: 0.75rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>${record.participantNickname}</strong>님이 
-                        <strong>${record.bossName}</strong> 보스에 참여했습니다.
-                    </div>
-                    <small style="color: var(--gray-600);">${formatDateTime(record.recordDate)}</small>
-                </div>
-            `).join('');
+            var html = records.map(function(record) {
+                return '<div style="padding: 0.75rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">' +
+                    '<div>' +
+                        '<strong>' + (record.participantNickname || '') + '</strong>님이 ' +
+                        '<strong>' + (record.bossName || '') + '</strong> 보스에 참여했습니다.' +
+                    '</div>' +
+                    '<small style="color: var(--gray-600);">' + formatDateTime(record.recordDate) + '</small>' +
+                '</div>';
+            }).join('');
             
             container.innerHTML = html;
         }
         
-        async function loadMembers() {
-            try {
-                const result = await apiCall('getMembers');
-                
+        function loadMembers() {
+            apiCall('getMembers', {}, function(result) {
                 if (result.success) {
-                    membersData = result.data.members;
+                    membersData = result.data.members || [];
                     displayMembers(membersData);
                 } else {
                     showAlert('회원 목록을 불러올 수 없습니다.', 'danger');
                 }
-            } catch (error) {
-                console.error('회원 목록 로딩 오류:', error);
-            }
+            });
         }
         
         function displayMembers(members) {
-            const tbody = document.getElementById('membersTableBody');
+            var tbody = document.getElementById('membersTableBody');
+            if (!tbody) return;
             
             if (members.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">회원이 없습니다.</td></tr>';
                 return;
             }
             
-            const html = members.map(member => `
-                <tr>
-                    <td>${member.nickname}</td>
-                    <td><span class="badge badge-${getRoleBadgeClass(member.role)}">${getRoleDisplayName(member.role)}</span></td>
-                    <td>${formatDate(member.joinDate)}</td>
-                    <td>${member.lastLoginFormatted || '없음'}</td>
-                    <td><span class="badge badge-${member.isActive ? 'success' : 'secondary'}">${member.isActive ? '활성' : '비활성'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="editMember('${member.id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            var html = members.map(function(member) {
+                return '<tr>' +
+                    '<td>' + (member.nickname || '') + '</td>' +
+                    '<td><span class="badge badge-' + getRoleBadgeClass(member.role) + '">' + getRoleDisplayName(member.role) + '</span></td>' +
+                    '<td>' + formatDate(member.joinDate) + '</td>' +
+                    '<td>' + (member.lastLoginFormatted || '없음') + '</td>' +
+                    '<td><span class="badge badge-' + (member.isActive ? 'success' : 'secondary') + '">' + (member.isActive ? '활성' : '비활성') + '</span></td>' +
+                    '<td>' +
+                        '<button class="btn btn-sm btn-primary" onclick="editMember(\'' + (member.id || '') + '\')">' +
+                            '<i class="fas fa-edit"></i>' +
+                        '</button>' +
+                    '</td>' +
+                '</tr>';
+            }).join('');
             
             tbody.innerHTML = html;
         }
@@ -1068,118 +1307,140 @@
             }
         }
         
-        async function loadBossRecords() {
-            try {
-                const result = await apiCall('getBossRecords');
-                
+        function loadBossRecords() {
+            apiCall('getBossRecords', {}, function(result) {
                 if (result.success) {
-                    bossRecordsData = result.data.records;
+                    bossRecordsData = result.data.records || [];
                     displayBossRecords(bossRecordsData);
                 } else {
                     showAlert('보스 기록을 불러올 수 없습니다.', 'danger');
                 }
-            } catch (error) {
-                console.error('보스 기록 로딩 오류:', error);
-            }
+            });
         }
         
         function displayBossRecords(records) {
-            const tbody = document.getElementById('bossRecordsTableBody');
+            var tbody = document.getElementById('bossRecordsTableBody');
+            if (!tbody) return;
             
             if (records.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">보스 기록이 없습니다.</td></tr>';
                 return;
             }
             
-            const html = records.map(record => `
-                <tr>
-                    <td>${record.bossName}</td>
-                    <td>${record.participantNickname}</td>
-                    <td>${record.participantClass || '-'}</td>
-                    <td>${record.contribution.toLocaleString()}</td>
-                    <td>${formatDateTime(record.recordDate)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="editBossRecord('${record.id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            var html = records.map(function(record) {
+                return '<tr>' +
+                    '<td>' + (record.bossName || '') + '</td>' +
+                    '<td>' + (record.participantNickname || '') + '</td>' +
+                    '<td>' + (record.participantClass || '-') + '</td>' +
+                    '<td>' + (record.contribution ? record.contribution.toLocaleString() : '0') + '</td>' +
+                    '<td>' + formatDateTime(record.recordDate) + '</td>' +
+                    '<td>' +
+                        '<button class="btn btn-sm btn-primary" onclick="editBossRecord(\'' + (record.id || '') + '\')">' +
+                            '<i class="fas fa-edit"></i>' +
+                        '</button>' +
+                    '</td>' +
+                '</tr>';
+            }).join('');
             
             tbody.innerHTML = html;
         }
         
         function loadStatistics() {
-            // TODO: Implement statistics loading
+            // TODO: 통계 로딩 구현
         }
         
         function loadAdminPage() {
-            // TODO: Implement admin page loading
+            // TODO: 관리자 페이지 로딩 구현
         }
         
-        // Modal functions
+        // 모달 관련 함수들
         function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
+            var modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
         }
         
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+            var modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
         }
         
-        function openMemberModal(memberId = null) {
-            // TODO: Implement member modal
+        function openMemberModal(memberId) {
             openModal('memberModal');
+            // TODO: 회원 정보 로드 및 표시
         }
         
         function openBossRecordModal() {
-            // TODO: Implement boss record modal
             openModal('bossRecordModal');
+            // TODO: 보스 목록 로드
         }
         
         function editMember(memberId) {
-            // TODO: Implement member editing
-            console.log('Edit member:', memberId);
+            console.log('회원 수정:', memberId);
+            // TODO: 회원 수정 구현
         }
         
         function editBossRecord(recordId) {
-            // TODO: Implement boss record editing
-            console.log('Edit boss record:', recordId);
+            console.log('보스 기록 수정:', recordId);
+            // TODO: 보스 기록 수정 구현
         }
         
-        // Event listeners
-        document.getElementById('loginForm').addEventListener('submit', login);
-        
-        // Search functionality
-        document.getElementById('memberSearch').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredMembers = membersData.filter(member => 
-                member.nickname.toLowerCase().includes(searchTerm) ||
-                member.email.toLowerCase().includes(searchTerm)
-            );
-            displayMembers(filteredMembers);
-        });
-        
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check for existing session
-            const savedSession = sessionStorage.getItem('userSession');
-            if (savedSession) {
-                // TODO: Validate session with server
-                // For now, just show login page
+        // 초기화 함수
+        function initializeApp() {
+            console.log('앱 초기화 시작');
+            
+            // 이벤트 리스너 설정
+            setupEventListeners();
+            
+            // 기본 날짜 설정
+            var recordDateInput = document.getElementById('recordDate');
+            if (recordDateInput) {
+                var now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                recordDateInput.value = now.toISOString().slice(0, 16);
             }
             
-            // Set default date for boss record
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('recordDate').value = now.toISOString().slice(0, 16);
-        });
-        
-        // Close modals when clicking outside
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
+            // 저장된 세션 확인
+            try {
+                var savedSession = sessionStorage.getItem('userSession');
+                var savedUser = sessionStorage.getItem('currentUser');
+                
+                if (savedSession && savedUser) {
+                    var sessionData = JSON.parse(savedSession);
+                    var userData = JSON.parse(savedUser);
+                    
+                    // 세션 유효성 간단 확인
+                    if (sessionData.token && userData.nickname) {
+                        sessionToken = sessionData.token;
+                        currentUser = userData;
+                        
+                        // 서버에서 세션 검증
+                        apiCall('healthCheck', {}, function(result) {
+                            if (result.success) {
+                                showMainApp();
+                                loadDashboard();
+                            } else {
+                                finishLogout();
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn('세션 복구 실패:', e);
             }
-        });
+            
+            console.log('앱 초기화 완료');
+        }
+        
+        // DOM 로드 완료 시 초기화
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
     </script>
 </body>
 </html>
