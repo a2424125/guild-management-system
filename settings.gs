@@ -10,7 +10,7 @@ const SystemConfig = {
   BUILD_DATE: '2025-06-24',
   
   // ===== 스프레드시트 설정 =====
-  SPREADSHEET_ID: '1wPVjCv19E-jET1woQwvoJGH4KKa3-yvK_SXrCaBmKoI',
+  SPREADSHEET_ID: '1S4m_8ULsOqXZ8u15jgyXjpYZEbowOLEzhjmDWNKQ1YOPeAp5sFcUjJXr',
   
   // ===== 외부 API 설정 =====
   GEMINI_API_KEY: 'AIzaSyDCsasfBH5Ak26nagkpPiItQjTWP-Dk4CE',
