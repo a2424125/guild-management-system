@@ -5,25 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>길드 관리 시스템</title>
     
-    <!-- 모든 외부 CDN 제거, Google Fonts는 Google Apps Script에서 허용됨 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
+    <!-- 모든 외부 리소스 제거, 시스템 폰트만 사용 -->
     <style>
-        /* 인라인 SVG 아이콘 스타일 */
-        .icon {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            vertical-align: -0.125em;
-            fill: currentColor;
-        }
-        
-        .icon-lg {
-            width: 2em;
-            height: 2em;
-        }
-        
+        /* 시스템 폰트만 사용 */
         :root {
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --primary-color: #00BCD4;
             --secondary-color: #FFD54F;
             --accent-color: #FF6B6B;
@@ -42,16 +28,12 @@
             --gray-700: #495057;
             --gray-800: #343A40;
             --gray-900: #212529;
-            
             --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
             --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-            
             --border-radius: 8px;
             --border-radius-lg: 12px;
             --border-radius-xl: 16px;
-            
-            --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         * {
@@ -65,6 +47,13 @@
             line-height: 1.6;
             color: var(--gray-800);
             background-color: var(--gray-100);
+        }
+        
+        /* 텍스트 아이콘 사용 (SVG 대신) */
+        .text-icon {
+            display: inline-block;
+            font-weight: 700;
+            margin-right: 0.5rem;
         }
         
         .container {
@@ -97,11 +86,6 @@
             font-weight: 700;
         }
         
-        .logo-icon {
-            margin-right: 0.5rem;
-            font-size: 2rem;
-        }
-        
         .user-info {
             display: flex;
             align-items: center;
@@ -131,6 +115,7 @@
             display: flex;
             list-style: none;
             gap: 0;
+            flex-wrap: wrap;
         }
         
         .nav-item {
@@ -152,11 +137,6 @@
         .nav-link.active {
             background: var(--primary-color);
             color: var(--white);
-        }
-        
-        .nav-link .icon {
-            margin-right: 0.5rem;
-            font-size: 1.1rem;
         }
         
         /* Main Content */
@@ -215,10 +195,6 @@
             transition: all 0.3s ease;
             font-size: 0.9rem;
             font-family: inherit;
-        }
-        
-        .btn .icon {
-            margin-right: 0.5rem;
         }
         
         .btn-primary {
@@ -520,7 +496,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             .nav-list {
-                flex-wrap: wrap;
+                flex-direction: column;
             }
             
             .stats-grid {
@@ -548,77 +524,12 @@
     </style>
 </head>
 <body>
-    <!-- SVG 아이콘 정의 (인라인으로 포함) -->
-    <svg style="display: none;">
-        <defs>
-            <!-- 드래곤 아이콘 -->
-            <symbol id="icon-dragon" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-            </symbol>
-            
-            <!-- 로그인 아이콘 -->
-            <symbol id="icon-login" viewBox="0 0 24 24">
-                <path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/>
-            </symbol>
-            
-            <!-- 로그아웃 아이콘 -->
-            <symbol id="icon-logout" viewBox="0 0 24 24">
-                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-            </symbol>
-            
-            <!-- 사용자 추가 아이콘 -->
-            <symbol id="icon-user-plus" viewBox="0 0 24 24">
-                <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </symbol>
-            
-            <!-- 차트 아이콘 -->
-            <symbol id="icon-chart" viewBox="0 0 24 24">
-                <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
-            </symbol>
-            
-            <!-- 사용자 그룹 아이콘 -->
-            <symbol id="icon-users" viewBox="0 0 24 24">
-                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-            </symbol>
-            
-            <!-- 검 아이콘 -->
-            <symbol id="icon-sword" viewBox="0 0 24 24">
-                <path d="M6.92 5H5l9 9 1.92-1.92L6.92 5zM17.5 2c1.93 0 3.5 1.57 3.5 3.5l-2.04 2.04L16.92 5.5 19 3.42C18.58 3.16 18.06 3 17.5 3c-.86 0-1.64.33-2.22.92L11.5 7.71l1.42 1.42 3.79-3.79c.18-.19.43-.29.69-.29.26 0 .51.1.7.29.39.39.39 1.02 0 1.41l-3.79 3.79 1.42 1.42 3.78-3.78C20.17 7.14 20.5 6.36 20.5 5.5c0-1.93-1.57-3.5-3.5-3.5zM3 17.25L12.75 7.5l1.41 1.41L4.41 18.66 3 20.07V17.25z"/>
-            </symbol>
-            
-            <!-- 막대 차트 아이콘 -->
-            <symbol id="icon-bar-chart" viewBox="0 0 24 24">
-                <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/>
-            </symbol>
-            
-            <!-- 설정 아이콘 -->
-            <symbol id="icon-cog" viewBox="0 0 24 24">
-                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-            </symbol>
-            
-            <!-- 플러스 아이콘 -->
-            <symbol id="icon-plus" viewBox="0 0 24 24">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </symbol>
-            
-            <!-- 편집 아이콘 -->
-            <symbol id="icon-edit" viewBox="0 0 24 24">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </symbol>
-            
-            <!-- 닫기 아이콘 -->
-            <symbol id="icon-close" viewBox="0 0 24 24">
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </symbol>
-        </defs>
-    </svg>
-
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
             <div class="login-header">
                 <h1 class="login-title">
-                    <svg class="icon icon-lg"><use href="#icon-dragon"></use></svg>
+                    <span class="text-icon">⚔️</span>
                     길드 관리 시스템
                 </h1>
                 <p class="login-subtitle">안전하고 편리한 게임 관리 플랫폼</p>
@@ -636,12 +547,12 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
-                    <svg class="icon"><use href="#icon-login"></use></svg>
+                    <span class="text-icon">➜</span>
                     로그인
                 </button>
                 
                 <button type="button" class="btn btn-secondary" style="width: 100%;" id="registerButton">
-                    <svg class="icon"><use href="#icon-user-plus"></use></svg>
+                    <span class="text-icon">+</span>
                     회원가입
                 </button>
             </form>
@@ -655,7 +566,7 @@
             <div class="container">
                 <div class="header-content">
                     <div class="logo">
-                        <svg class="icon icon-lg logo-icon"><use href="#icon-dragon"></use></svg>
+                        <span class="text-icon" style="font-size: 2rem;">⚔️</span>
                         길드 관리 시스템
                     </div>
                     
@@ -663,7 +574,7 @@
                         <span id="userNickname">사용자</span>
                         <div class="user-avatar" id="userAvatar">U</div>
                         <button class="btn btn-secondary btn-sm" id="logoutButton">
-                            <svg class="icon"><use href="#icon-logout"></use></svg>
+                            <span class="text-icon">←</span>
                             로그아웃
                         </button>
                     </div>
@@ -677,31 +588,31 @@
                 <ul class="nav-list">
                     <li class="nav-item">
                         <a class="nav-link active" data-page="dashboard">
-                            <svg class="icon"><use href="#icon-chart"></use></svg>
+                            <span class="text-icon">📊</span>
                             대시보드
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-page="members">
-                            <svg class="icon"><use href="#icon-users"></use></svg>
+                            <span class="text-icon">👥</span>
                             회원 관리
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-page="boss-records">
-                            <svg class="icon"><use href="#icon-sword"></use></svg>
+                            <span class="text-icon">⚔️</span>
                             보스 기록
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-page="statistics">
-                            <svg class="icon"><use href="#icon-bar-chart"></use></svg>
+                            <span class="text-icon">📈</span>
                             통계
                         </a>
                     </li>
                     <li class="nav-item" id="adminNav" style="display: none;">
                         <a class="nav-link" data-page="admin">
-                            <svg class="icon"><use href="#icon-cog"></use></svg>
+                            <span class="text-icon">⚙️</span>
                             관리자
                         </a>
                     </li>
@@ -749,7 +660,7 @@
                         <div class="card-header">
                             <h2 class="card-title">회원 관리</h2>
                             <button class="btn btn-primary" id="addMemberButton">
-                                <svg class="icon"><use href="#icon-plus"></use></svg>
+                                <span class="text-icon">+</span>
                                 회원 추가
                             </button>
                         </div>
@@ -787,7 +698,7 @@
                         <div class="card-header">
                             <h2 class="card-title">보스 참여 기록</h2>
                             <button class="btn btn-primary" id="addBossRecordButton">
-                                <svg class="icon"><use href="#icon-plus"></use></svg>
+                                <span class="text-icon">+</span>
                                 기록 추가
                             </button>
                         </div>
@@ -836,7 +747,7 @@
                                 <h3>보스 관리</h3>
                                 <p>게임의 보스들을 추가, 수정, 삭제할 수 있습니다.</p>
                                 <button class="btn btn-primary" id="manageBossButton">
-                                    <svg class="icon"><use href="#icon-dragon"></use></svg>
+                                    <span class="text-icon">🐉</span>
                                     보스 관리
                                 </button>
                             </div>
@@ -845,7 +756,7 @@
                                 <h3>직업 관리</h3>
                                 <p>게임의 직업/클래스를 관리할 수 있습니다.</p>
                                 <button class="btn btn-primary" id="manageClassButton">
-                                    <svg class="icon"><use href="#icon-users"></use></svg>
+                                    <span class="text-icon">⚡</span>
                                     직업 관리
                                 </button>
                             </div>
@@ -854,7 +765,7 @@
                                 <h3>시스템 설정</h3>
                                 <p>게임 관련 설정을 변경할 수 있습니다.</p>
                                 <button class="btn btn-primary" id="systemSettingsButton">
-                                    <svg class="icon"><use href="#icon-cog"></use></svg>
+                                    <span class="text-icon">⚙️</span>
                                     시스템 설정
                                 </button>
                             </div>
@@ -870,9 +781,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">회원 정보</h3>
-                <button class="modal-close" data-modal="memberModal">
-                    <svg class="icon"><use href="#icon-close"></use></svg>
-                </button>
+                <button class="modal-close" data-modal="memberModal">✕</button>
             </div>
             <form id="memberForm">
                 <div class="form-group">
@@ -903,9 +812,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">보스 기록 추가</h3>
-                <button class="modal-close" data-modal="bossRecordModal">
-                    <svg class="icon"><use href="#icon-close"></use></svg>
-                </button>
+                <button class="modal-close" data-modal="bossRecordModal">✕</button>
             </div>
             <form id="bossRecordForm">
                 <div class="form-group">
@@ -937,60 +844,136 @@
     </div>
 
     <script>
-        // ===== 전역 변수들 =====
-        window.currentUser = null;
-        window.currentPage = 'dashboard';
-        window.membersData = [];
-        window.bossRecordsData = [];
-        window.bossListData = [];
-        window.sessionToken = null;
+        // ===== 전역 변수들 (명시적 선언) =====
+        var currentUser = null;
+        var currentPage = 'dashboard';
+        var membersData = [];
+        var bossRecordsData = [];
+        var bossListData = [];
+        var sessionToken = null;
         
-        // ===== 안전한 이벤트 리스너 설정 함수 =====
+        // ===== 유틸리티 함수들 =====
+        function showAlert(message, type) {
+            type = type || 'success';
+            var alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-' + type;
+            alertDiv.textContent = message;
+            
+            var container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+                
+                // setTimeout 안전 사용
+                setTimeout(function() {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 5000);
+            }
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            var date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR');
+        }
+        
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            var date = new Date(dateString);
+            return date.toLocaleString('ko-KR');
+        }
+        
+        // ===== Google Apps Script API 호출 =====
+        function apiCall(action, data, callback) {
+            data = data || {};
+            
+            // google.script.run 사용 (Google Apps Script 표준 방식)
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run
+                    .withSuccessHandler(callback)
+                    .withFailureHandler(function(error) {
+                        console.error('API 호출 오류:', error);
+                        showAlert('서버 오류가 발생했습니다.', 'danger');
+                        if (callback) {
+                            callback({ success: false, error: error.message });
+                        }
+                    })
+                    .doPost({ parameter: { action: action, data: JSON.stringify(data), sessionToken: sessionToken } });
+            } else {
+                // 폴백: FormData 사용
+                var formData = new FormData();
+                formData.append('action', action);
+                formData.append('data', JSON.stringify(data));
+                if (sessionToken) {
+                    formData.append('sessionToken', sessionToken);
+                }
+                
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (callback) {
+                        callback(result);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('API 호출 오류:', error);
+                    showAlert('서버 오류가 발생했습니다.', 'danger');
+                    if (callback) {
+                        callback({ success: false, error: error.message });
+                    }
+                });
+            }
+        }
+        
+        // ===== 이벤트 리스너 설정 =====
         function setupEventListeners() {
             // 로그인 폼
-            const loginForm = document.getElementById('loginForm');
+            var loginForm = document.getElementById('loginForm');
             if (loginForm) {
                 loginForm.addEventListener('submit', handleLogin);
             }
             
             // 회원가입 버튼
-            const registerButton = document.getElementById('registerButton');
+            var registerButton = document.getElementById('registerButton');
             if (registerButton) {
                 registerButton.addEventListener('click', showRegisterForm);
             }
             
             // 로그아웃 버튼
-            const logoutButton = document.getElementById('logoutButton');
+            var logoutButton = document.getElementById('logoutButton');
             if (logoutButton) {
                 logoutButton.addEventListener('click', logout);
             }
             
             // 네비게이션 링크들
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(function(link) {
+            document.querySelectorAll('.nav-link').forEach(function(link) {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const pageId = this.getAttribute('data-page');
+                    var pageId = this.getAttribute('data-page');
                     if (pageId) {
                         showPage(pageId);
                     }
                 });
             });
             
-            // 모달 닫기 버튼들
-            const modalCloses = document.querySelectorAll('.modal-close, [data-modal]');
-            modalCloses.forEach(function(button) {
+            // 모달 닫기
+            document.querySelectorAll('.modal-close, [data-modal]').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    const modalId = this.getAttribute('data-modal');
+                    var modalId = this.getAttribute('data-modal');
                     if (modalId) {
                         closeModal(modalId);
                     }
                 });
             });
             
-            // 모달 배경 클릭으로 닫기
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(function(modal) {
+            // 모달 배경 클릭
+            document.querySelectorAll('.modal').forEach(function(modal) {
                 modal.addEventListener('click', function(e) {
                     if (e.target === this) {
                         this.classList.remove('active');
@@ -1002,11 +985,11 @@
             setupPageButtons();
             
             // 검색 기능
-            const memberSearch = document.getElementById('memberSearch');
+            var memberSearch = document.getElementById('memberSearch');
             if (memberSearch) {
                 memberSearch.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    const filteredMembers = window.membersData.filter(function(member) {
+                    var searchTerm = e.target.value.toLowerCase();
+                    var filteredMembers = membersData.filter(function(member) {
                         return member.nickname.toLowerCase().includes(searchTerm) ||
                                (member.email && member.email.toLowerCase().includes(searchTerm));
                     });
@@ -1016,38 +999,38 @@
         }
         
         function setupPageButtons() {
-            // 회원 추가 버튼
-            const addMemberButton = document.getElementById('addMemberButton');
+            // 회원 추가
+            var addMemberButton = document.getElementById('addMemberButton');
             if (addMemberButton) {
                 addMemberButton.addEventListener('click', function() {
                     openMemberModal();
                 });
             }
             
-            // 보스 기록 추가 버튼
-            const addBossRecordButton = document.getElementById('addBossRecordButton');
+            // 보스 기록 추가
+            var addBossRecordButton = document.getElementById('addBossRecordButton');
             if (addBossRecordButton) {
                 addBossRecordButton.addEventListener('click', function() {
                     openBossRecordModal();
                 });
             }
             
-            // 관리자 페이지 버튼들
-            const manageBossButton = document.getElementById('manageBossButton');
+            // 관리자 버튼들
+            var manageBossButton = document.getElementById('manageBossButton');
             if (manageBossButton) {
                 manageBossButton.addEventListener('click', function() {
                     showAlert('보스 관리 기능은 준비 중입니다.', 'warning');
                 });
             }
             
-            const manageClassButton = document.getElementById('manageClassButton');
+            var manageClassButton = document.getElementById('manageClassButton');
             if (manageClassButton) {
                 manageClassButton.addEventListener('click', function() {
                     showAlert('직업 관리 기능은 준비 중입니다.', 'warning');
                 });
             }
             
-            const systemSettingsButton = document.getElementById('systemSettingsButton');
+            var systemSettingsButton = document.getElementById('systemSettingsButton');
             if (systemSettingsButton) {
                 systemSettingsButton.addEventListener('click', function() {
                     showAlert('시스템 설정 기능은 준비 중입니다.', 'warning');
@@ -1055,84 +1038,17 @@
             }
         }
         
-        // ===== 유틸리티 함수들 =====
-        function showAlert(message, type) {
-            type = type || 'success';
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-' + type;
-            alertDiv.textContent = message;
-            
-            const container = document.querySelector('.container');
-            if (container) {
-                container.insertBefore(alertDiv, container.firstChild);
-                
-                // 5초 후 자동 제거
-                window.setTimeout(function() {
-                    if (alertDiv.parentNode) {
-                        alertDiv.parentNode.removeChild(alertDiv);
-                    }
-                }, 5000);
-            }
-        }
-        
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ko-KR');
-        }
-        
-        function formatDateTime(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleString('ko-KR');
-        }
-        
-        // ===== API 호출 함수 - 완전 CSP 안전 =====
-        function apiCall(action, data, callback) {
-            data = data || {};
-            
-            // FormData 생성
-            const formData = new FormData();
-            formData.append('action', action);
-            formData.append('data', JSON.stringify(data));
-            
-            if (window.sessionToken) {
-                formData.append('sessionToken', window.sessionToken);
-            }
-            
-            // fetch 요청
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(result) {
-                if (callback) {
-                    callback(result);
-                }
-            })
-            .catch(function(error) {
-                console.error('API 호출 오류:', error);
-                showAlert('서버 오류가 발생했습니다.', 'danger');
-                if (callback) {
-                    callback({ success: false, error: error.message });
-                }
-            });
-        }
-        
         // ===== 인증 관련 함수들 =====
         function handleLogin(event) {
             event.preventDefault();
             
-            const nickname = document.getElementById('loginNickname').value;
-            const password = document.getElementById('loginPassword').value;
+            var nickname = document.getElementById('loginNickname').value;
+            var password = document.getElementById('loginPassword').value;
             
             apiCall('login', { nickname: nickname, password: password }, function(result) {
                 if (result.success) {
-                    window.currentUser = result.data.user;
-                    window.sessionToken = result.data.session.token;
+                    currentUser = result.data.user;
+                    sessionToken = result.data.session.token;
                     
                     // 세션 저장
                     try {
@@ -1151,9 +1067,8 @@
         }
         
         function logout() {
-            if (window.sessionToken) {
+            if (sessionToken) {
                 apiCall('logout', {}, function(result) {
-                    // 결과와 상관없이 로그아웃 처리
                     finishLogout();
                 });
             } else {
@@ -1162,10 +1077,9 @@
         }
         
         function finishLogout() {
-            window.currentUser = null;
-            window.sessionToken = null;
+            currentUser = null;
+            sessionToken = null;
             
-            // 세션 정리
             try {
                 sessionStorage.removeItem('userSession');
                 sessionStorage.removeItem('currentUser');
@@ -1176,8 +1090,7 @@
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('appContainer').style.display = 'none';
             
-            // 폼 리셋
-            const loginForm = document.getElementById('loginForm');
+            var loginForm = document.getElementById('loginForm');
             if (loginForm) {
                 loginForm.reset();
             }
@@ -1187,21 +1100,19 @@
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
             
-            // 사용자 정보 업데이트
-            if (window.currentUser) {
-                const userNickname = document.getElementById('userNickname');
-                const userAvatar = document.getElementById('userAvatar');
+            if (currentUser) {
+                var userNickname = document.getElementById('userNickname');
+                var userAvatar = document.getElementById('userAvatar');
                 
                 if (userNickname) {
-                    userNickname.textContent = window.currentUser.nickname;
+                    userNickname.textContent = currentUser.nickname;
                 }
                 if (userAvatar) {
-                    userAvatar.textContent = window.currentUser.nickname.charAt(0).toUpperCase();
+                    userAvatar.textContent = currentUser.nickname.charAt(0).toUpperCase();
                 }
                 
-                // 관리자 네비게이션 표시
-                if (window.currentUser.role === 'ADMIN' || window.currentUser.role === 'GUILD_MASTER') {
-                    const adminNav = document.getElementById('adminNav');
+                if (currentUser.role === 'ADMIN' || currentUser.role === 'GUILD_MASTER') {
+                    var adminNav = document.getElementById('adminNav');
                     if (adminNav) {
                         adminNav.style.display = 'block';
                     }
@@ -1215,31 +1126,25 @@
         
         // ===== 네비게이션 함수들 =====
         function showPage(pageId) {
-            // 모든 페이지 숨기기
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(function(page) {
+            document.querySelectorAll('.page').forEach(function(page) {
                 page.classList.remove('active');
             });
             
-            // 모든 네비게이션 링크 비활성화
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(function(link) {
+            document.querySelectorAll('.nav-link').forEach(function(link) {
                 link.classList.remove('active');
             });
             
-            // 선택된 페이지 표시
-            const targetPage = document.getElementById(pageId + 'Page');
+            var targetPage = document.getElementById(pageId + 'Page');
             if (targetPage) {
                 targetPage.classList.add('active');
             }
             
-            // 해당 네비게이션 링크 활성화
-            const targetNav = document.querySelector('.nav-link[data-page="' + pageId + '"]');
+            var targetNav = document.querySelector('.nav-link[data-page="' + pageId + '"]');
             if (targetNav) {
                 targetNav.classList.add('active');
             }
             
-            window.currentPage = pageId;
+            currentPage = pageId;
             
             // 페이지별 데이터 로드
             switch (pageId) {
@@ -1263,12 +1168,11 @@
         
         // ===== 데이터 로딩 함수들 =====
         function loadDashboard() {
-            // 회원 통계 로드
             apiCall('getMembers', {}, function(result) {
                 if (result.success) {
-                    const data = result.data;
-                    const totalMembersEl = document.getElementById('totalMembers');
-                    const activeMembersEl = document.getElementById('activeMembers');
+                    var data = result.data;
+                    var totalMembersEl = document.getElementById('totalMembers');
+                    var activeMembersEl = document.getElementById('activeMembers');
                     
                     if (totalMembersEl) {
                         totalMembersEl.textContent = data.totalCount || 0;
@@ -1279,29 +1183,26 @@
                 }
             });
             
-            // 보스 기록 통계 로드
             apiCall('getBossRecords', {}, function(result) {
                 if (result.success) {
-                    const totalRecordsEl = document.getElementById('totalBossRecords');
-                    const weeklyParticipationEl = document.getElementById('weeklyParticipation');
+                    var totalRecordsEl = document.getElementById('totalBossRecords');
+                    var weeklyParticipationEl = document.getElementById('weeklyParticipation');
                     
                     if (totalRecordsEl) {
                         totalRecordsEl.textContent = result.data.totalCount || 0;
                     }
                     
-                    // 주간 참여 계산
                     if (weeklyParticipationEl && result.data.records) {
-                        const weekAgo = new Date();
+                        var weekAgo = new Date();
                         weekAgo.setDate(weekAgo.getDate() - 7);
                         
-                        const weeklyCount = result.data.records.filter(function(record) {
+                        var weeklyCount = result.data.records.filter(function(record) {
                             return new Date(record.recordDate) >= weekAgo;
                         }).length;
                         
                         weeklyParticipationEl.textContent = weeklyCount;
                     }
                     
-                    // 최근 활동 표시
                     if (result.data.records) {
                         displayRecentActivity(result.data.records.slice(0, 5));
                     }
@@ -1310,7 +1211,7 @@
         }
         
         function displayRecentActivity(records) {
-            const container = document.getElementById('recentActivity');
+            var container = document.getElementById('recentActivity');
             if (!container) return;
             
             if (records.length === 0) {
@@ -1318,7 +1219,7 @@
                 return;
             }
             
-            const html = records.map(function(record) {
+            var html = records.map(function(record) {
                 return '<div style="padding: 0.75rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">' +
                     '<div>' +
                         '<strong>' + (record.participantNickname || '') + '</strong>님이 ' +
@@ -1334,8 +1235,8 @@
         function loadMembers() {
             apiCall('getMembers', {}, function(result) {
                 if (result.success) {
-                    window.membersData = result.data.members || [];
-                    displayMembers(window.membersData);
+                    membersData = result.data.members || [];
+                    displayMembers(membersData);
                 } else {
                     showAlert('회원 목록을 불러올 수 없습니다.', 'danger');
                 }
@@ -1343,7 +1244,7 @@
         }
         
         function displayMembers(members) {
-            const tbody = document.getElementById('membersTableBody');
+            var tbody = document.getElementById('membersTableBody');
             if (!tbody) return;
             
             if (members.length === 0) {
@@ -1351,7 +1252,7 @@
                 return;
             }
             
-            const html = members.map(function(member) {
+            var html = members.map(function(member) {
                 return '<tr>' +
                     '<td>' + (member.nickname || '') + '</td>' +
                     '<td><span class="badge badge-' + getRoleBadgeClass(member.role) + '">' + getRoleDisplayName(member.role) + '</span></td>' +
@@ -1359,19 +1260,17 @@
                     '<td>' + (member.lastLoginFormatted || '없음') + '</td>' +
                     '<td><span class="badge badge-' + (member.isActive ? 'success' : 'secondary') + '">' + (member.isActive ? '활성' : '비활성') + '</span></td>' +
                     '<td>' +
-                        '<button class="btn btn-sm btn-primary" data-member-id="' + (member.id || '') + '" data-action="edit">' +
-                            '<svg class="icon"><use href="#icon-edit"></use></svg>' +
-                        '</button>' +
+                        '<button class="btn btn-sm btn-primary" data-member-id="' + (member.id || '') + '" data-action="edit">✏️</button>' +
                     '</td>' +
                 '</tr>';
             }).join('');
             
             tbody.innerHTML = html;
             
-            // 편집 버튼 이벤트 리스너 추가
+            // 편집 버튼 이벤트
             tbody.querySelectorAll('button[data-action="edit"]').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    const memberId = this.getAttribute('data-member-id');
+                    var memberId = this.getAttribute('data-member-id');
                     editMember(memberId);
                 });
             });
@@ -1399,8 +1298,8 @@
         function loadBossRecords() {
             apiCall('getBossRecords', {}, function(result) {
                 if (result.success) {
-                    window.bossRecordsData = result.data.records || [];
-                    displayBossRecords(window.bossRecordsData);
+                    bossRecordsData = result.data.records || [];
+                    displayBossRecords(bossRecordsData);
                 } else {
                     showAlert('보스 기록을 불러올 수 없습니다.', 'danger');
                 }
@@ -1408,7 +1307,7 @@
         }
         
         function displayBossRecords(records) {
-            const tbody = document.getElementById('bossRecordsTableBody');
+            var tbody = document.getElementById('bossRecordsTableBody');
             if (!tbody) return;
             
             if (records.length === 0) {
@@ -1416,7 +1315,7 @@
                 return;
             }
             
-            const html = records.map(function(record) {
+            var html = records.map(function(record) {
                 return '<tr>' +
                     '<td>' + (record.bossName || '') + '</td>' +
                     '<td>' + (record.participantNickname || '') + '</td>' +
@@ -1424,19 +1323,17 @@
                     '<td>' + (record.contribution ? record.contribution.toLocaleString() : '0') + '</td>' +
                     '<td>' + formatDateTime(record.recordDate) + '</td>' +
                     '<td>' +
-                        '<button class="btn btn-sm btn-primary" data-record-id="' + (record.id || '') + '" data-action="edit">' +
-                            '<svg class="icon"><use href="#icon-edit"></use></svg>' +
-                        '</button>' +
+                        '<button class="btn btn-sm btn-primary" data-record-id="' + (record.id || '') + '" data-action="edit">✏️</button>' +
                     '</td>' +
                 '</tr>';
             }).join('');
             
             tbody.innerHTML = html;
             
-            // 편집 버튼 이벤트 리스너 추가
+            // 편집 버튼 이벤트
             tbody.querySelectorAll('button[data-action="edit"]').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    const recordId = this.getAttribute('data-record-id');
+                    var recordId = this.getAttribute('data-record-id');
                     editBossRecord(recordId);
                 });
             });
@@ -1452,14 +1349,14 @@
         
         // ===== 모달 관련 함수들 =====
         function openModal(modalId) {
-            const modal = document.getElementById(modalId);
+            var modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('active');
             }
         }
         
         function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
+            var modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('active');
             }
@@ -1493,28 +1390,26 @@
             setupEventListeners();
             
             // 기본 날짜 설정
-            const recordDateInput = document.getElementById('recordDate');
+            var recordDateInput = document.getElementById('recordDate');
             if (recordDateInput) {
-                const now = new Date();
+                var now = new Date();
                 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                 recordDateInput.value = now.toISOString().slice(0, 16);
             }
             
             // 저장된 세션 확인
             try {
-                const savedSession = sessionStorage.getItem('userSession');
-                const savedUser = sessionStorage.getItem('currentUser');
+                var savedSession = sessionStorage.getItem('userSession');
+                var savedUser = sessionStorage.getItem('currentUser');
                 
                 if (savedSession && savedUser) {
-                    const sessionData = JSON.parse(savedSession);
-                    const userData = JSON.parse(savedUser);
+                    var sessionData = JSON.parse(savedSession);
+                    var userData = JSON.parse(savedUser);
                     
-                    // 세션 유효성 간단 확인
                     if (sessionData.token && userData.nickname) {
-                        window.sessionToken = sessionData.token;
-                        window.currentUser = userData;
+                        sessionToken = sessionData.token;
+                        currentUser = userData;
                         
-                        // 서버에서 세션 검증
                         apiCall('healthCheck', {}, function(result) {
                             if (result.success) {
                                 showMainApp();
