@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>길드 관리 시스템</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #00BCD4;
+            --secondary-color: #FFD54F;
+            --accent-color: #FF6B6B;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --danger-color: #F44336;
+            --dark-color: #2C3E50;
+            --light-color: #ECF0F1;
+            --white: #FFFFFF;
+            --gray-100: #F8F9FA;
+            --gray-200: #E9ECEF;
+            --gray-300: #DEE2E6;
+            --gray-400: #CED4DA;
+            --gray-500: #ADB5BD;
+            --gray-600: #6C757D;
+            --gray-700: #495057;
+            --gray-800: #343A40;
+            --gray-900: #212529;
+            
+            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            
+            --border-radius: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            
+            --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 2rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        /* Navigation */
+        .nav {
+            background: var(--white);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 0;
+        }
+        
+        .nav-item {
+            margin: 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--gray-600);
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .nav-link i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Main Content */
+        .main {
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background: #0097A7;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: var(--white);
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--white);
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-500);
+            color: var(--white);
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+        /* Forms */
+        .form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+        }
+        
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+        
+        .table tr:hover {
+            background: var(--gray-50);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), #0097A7);
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-subtitle {
+            color: var(--gray-600);
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--white);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-wrap: wrap;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .modal {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+        }
+        
+        /* Hide for non-logged in users */
+        .app-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">
+                    <i class="fas fa-shield-alt"></i>
+                    길드 관리 시스템
+                </h1>
+                <p class="login-subtitle">안전하고 편리한 게임 관리 플랫폼</p>
+            </div>
+            
+            <form id="loginForm" class="form">
+                <div class="form-group">
+                    <label class="form-label">닉네임</label>
+                    <input type="text" class="form-control" id="loginNickname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    로그인
+                </button>
+                
+                <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="showRegisterForm()">
+                    <i class="fas fa-user-plus"></i>
+                    회원가입
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Main App -->
+    <div id="appContainer" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-dragon"></i>
+                        길드 관리 시스템
+                    </div>
+                    
+                    <div class="user-info">
+                        <span id="userNickname">사용자</span>
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <button class="btn btn-secondary btn-sm" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            로그아웃
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a class="nav-link active" onclick="showPage('dashboard')">
+                            <i class="fas fa-chart-line"></i>
+                            대시보드
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showPage('members')">
+                            <i class="fas fa-users"></i>
+                            회원 관리
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showPage('boss-records')">
+                            <i class="fas fa-sword"></i>
+                            보스 기록
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showPage('statistics')">
+                            <i class="fas fa-chart-bar"></i>
+                            통계
+                        </a>
+                    </li>
+                    <li class="nav-item" id="adminNav" style="display: none;">
+                        <a class="nav-link" onclick="showPage('admin')">
+                            <i class="fas fa-cog"></i>
+                            관리자
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalMembers">0</div>
+                            <div class="stat-label">총 회원 수</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--success-color), #388E3C);">
+                            <div class="stat-value" id="activeMembers">0</div>
+                            <div class="stat-label">활성 회원</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--warning-color), #F57C00);">
+                            <div class="stat-value" id="totalBossRecords">0</div>
+                            <div class="stat-label">보스 기록</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-color), #E53935);">
+                            <div class="stat-value" id="weeklyParticipation">0</div>
+                            <div class="stat-label">주간 참여</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">최근 활동</h2>
+                        </div>
+                        <div id="recentActivity">
+                            <p class="text-center">데이터를 불러오는 중...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Members Page -->
+                <div id="membersPage" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">회원 관리</h2>
+                            <button class="btn btn-primary" onclick="openMemberModal()">
+                                <i class="fas fa-plus"></i>
+                                회원 추가
+                            </button>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <input type="text" class="form-control" id="memberSearch" 
+                                   placeholder="회원 검색..." style="max-width: 300px;">
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>닉네임</th>
+                                        <th>역할</th>
+                                        <th>가입일</th>
+                                        <th>최근 로그인</th>
+                                        <th>상태</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="membersTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">데이터를 불러오는 중...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Boss Records Page -->
+                <div id="bossRecordsPage" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">보스 참여 기록</h2>
+                            <button class="btn btn-primary" onclick="openBossRecordModal()">
+                                <i class="fas fa-plus"></i>
+                                기록 추가
+                            </button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>보스명</th>
+                                        <th>참여자</th>
+                                        <th>직업</th>
+                                        <th>기여도</th>
+                                        <th>날짜</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bossRecordsTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">데이터를 불러오는 중...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics Page -->
+                <div id="statisticsPage" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">통계 정보</h2>
+                        </div>
+                        <p>통계 기능은 준비 중입니다.</p>
+                    </div>
+                </div>
+                
+                <!-- Admin Page -->
+                <div id="adminPage" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">관리자 기능</h2>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                            <div class="card">
+                                <h3>보스 관리</h3>
+                                <p>게임의 보스들을 추가, 수정, 삭제할 수 있습니다.</p>
+                                <button class="btn btn-primary" onclick="openBossManageModal()">
+                                    <i class="fas fa-dragon"></i>
+                                    보스 관리
+                                </button>
+                            </div>
+                            
+                            <div class="card">
+                                <h3>직업 관리</h3>
+                                <p>게임의 직업/클래스를 관리할 수 있습니다.</p>
+                                <button class="btn btn-primary" onclick="openClassManageModal()">
+                                    <i class="fas fa-user-ninja"></i>
+                                    직업 관리
+                                </button>
+                            </div>
+                            
+                            <div class="card">
+                                <h3>시스템 설정</h3>
+                                <p>게임 관련 설정을 변경할 수 있습니다.</p>
+                                <button class="btn btn-primary" onclick="openSystemSettingsModal()">
+                                    <i class="fas fa-cogs"></i>
+                                    시스템 설정
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">회원 정보</h3>
+                <button class="modal-close" onclick="closeModal('memberModal')">&times;</button>
+            </div>
+            <form id="memberForm">
+                <div class="form-group">
+                    <label class="form-label">닉네임</label>
+                    <input type="text" class="form-control" id="memberNickname" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">이메일</label>
+                    <input type="email" class="form-control" id="memberEmail">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">역할</label>
+                    <select class="form-control" id="memberRole">
+                        <option value="MEMBER">일반 회원</option>
+                        <option value="OFFICER">임원</option>
+                        <option value="GUILD_MASTER">길드마스터</option>
+                    </select>
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('memberModal')">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="bossRecordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">보스 기록 추가</h3>
+                <button class="modal-close" onclick="closeModal('bossRecordModal')">&times;</button>
+            </div>
+            <form id="bossRecordForm">
+                <div class="form-group">
+                    <label class="form-label">보스명</label>
+                    <select class="form-control" id="bossSelect" required>
+                        <option value="">보스를 선택하세요</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">참여자 (여러 명 선택 가능)</label>
+                    <div id="participantsList" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--gray-300); border-radius: var(--border-radius); padding: 0.5rem;">
+                        <!-- 동적으로 생성 -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">기록 날짜</label>
+                    <input type="datetime-local" class="form-control" id="recordDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">비고</label>
+                    <textarea class="form-control" id="recordNotes" rows="3"></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('bossRecordModal')">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentPage = 'dashboard';
+        let membersData = [];
+        let bossRecordsData = [];
+        let bossListData = [];
+        
+        // Utility functions
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR');
+        }
+        
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('ko-KR');
+        }
+        
+        // API calls
+        async function apiCall(action, data = {}) {
+            try {
+                const formData = new FormData();
+                formData.append('action', action);
+                formData.append('data', JSON.stringify(data));
+                
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API 호출 오류:', error);
+                showAlert('서버 오류가 발생했습니다.', 'danger');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // Authentication
+        async function login(event) {
+            event.preventDefault();
+            
+            const nickname = document.getElementById('loginNickname').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = await apiCall('login', { nickname, password });
+            
+            if (result.success) {
+                currentUser = result.data.user;
+                sessionStorage.setItem('userSession', JSON.stringify(result.data.session));
+                showMainApp();
+                loadDashboard();
+            } else {
+                showAlert(result.message || '로그인에 실패했습니다.', 'danger');
+            }
+        }
+        
+        function logout() {
+            currentUser = null;
+            sessionStorage.removeItem('userSession');
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            
+            // Reset forms
+            document.getElementById('loginForm').reset();
+        }
+        
+        function showMainApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            
+            // Update user info
+            document.getElementById('userNickname').textContent = currentUser.nickname;
+            document.getElementById('userAvatar').textContent = currentUser.nickname.charAt(0).toUpperCase();
+            
+            // Show admin nav if user is admin
+            if (currentUser.role === 'ADMIN' || currentUser.role === 'GUILD_MASTER') {
+                document.getElementById('adminNav').style.display = 'block';
+            }
+        }
+        
+        function showRegisterForm() {
+            showAlert('회원가입 기능은 관리자에게 문의하세요.', 'warning');
+        }
+        
+        // Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Remove active class from nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.add('active');
+            
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+            
+            currentPage = pageId;
+            
+            // Load page data
+            switch (pageId) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'members':
+                    loadMembers();
+                    break;
+                case 'boss-records':
+                    loadBossRecords();
+                    break;
+                case 'statistics':
+                    loadStatistics();
+                    break;
+                case 'admin':
+                    loadAdminPage();
+                    break;
+            }
+        }
+        
+        // Data loading functions
+        async function loadDashboard() {
+            try {
+                // Load statistics for dashboard
+                const membersResult = await apiCall('getMembers');
+                const recordsResult = await apiCall('getBossRecords');
+                
+                if (membersResult.success) {
+                    const data = membersResult.data;
+                    document.getElementById('totalMembers').textContent = data.totalCount;
+                    document.getElementById('activeMembers').textContent = 
+                        data.summary ? data.summary.activeMembers : 0;
+                }
+                
+                if (recordsResult.success) {
+                    document.getElementById('totalBossRecords').textContent = recordsResult.data.totalCount;
+                    
+                    // Calculate weekly participation
+                    const weeklyCount = recordsResult.data.records.filter(record => {
+                        const recordDate = new Date(record.recordDate);
+                        const weekAgo = new Date();
+                        weekAgo.setDate(weekAgo.getDate() - 7);
+                        return recordDate >= weekAgo;
+                    }).length;
+                    
+                    document.getElementById('weeklyParticipation').textContent = weeklyCount;
+                    
+                    // Show recent activity
+                    displayRecentActivity(recordsResult.data.records.slice(0, 5));
+                }
+            } catch (error) {
+                console.error('대시보드 로딩 오류:', error);
+            }
+        }
+        
+        function displayRecentActivity(records) {
+            const container = document.getElementById('recentActivity');
+            
+            if (records.length === 0) {
+                container.innerHTML = '<p>최근 활동이 없습니다.</p>';
+                return;
+            }
+            
+            const html = records.map(record => `
+                <div style="padding: 0.75rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${record.participantNickname}</strong>님이 
+                        <strong>${record.bossName}</strong> 보스에 참여했습니다.
+                    </div>
+                    <small style="color: var(--gray-600);">${formatDateTime(record.recordDate)}</small>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        async function loadMembers() {
+            try {
+                const result = await apiCall('getMembers');
+                
+                if (result.success) {
+                    membersData = result.data.members;
+                    displayMembers(membersData);
+                } else {
+                    showAlert('회원 목록을 불러올 수 없습니다.', 'danger');
+                }
+            } catch (error) {
+                console.error('회원 목록 로딩 오류:', error);
+            }
+        }
+        
+        function displayMembers(members) {
+            const tbody = document.getElementById('membersTableBody');
+            
+            if (members.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">회원이 없습니다.</td></tr>';
+                return;
+            }
+            
+            const html = members.map(member => `
+                <tr>
+                    <td>${member.nickname}</td>
+                    <td><span class="badge badge-${getRoleBadgeClass(member.role)}">${getRoleDisplayName(member.role)}</span></td>
+                    <td>${formatDate(member.joinDate)}</td>
+                    <td>${member.lastLoginFormatted || '없음'}</td>
+                    <td><span class="badge badge-${member.isActive ? 'success' : 'secondary'}">${member.isActive ? '활성' : '비활성'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editMember('${member.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            tbody.innerHTML = html;
+        }
+        
+        function getRoleBadgeClass(role) {
+            switch (role) {
+                case 'ADMIN': return 'danger';
+                case 'GUILD_MASTER': return 'warning';
+                case 'OFFICER': return 'primary';
+                default: return 'secondary';
+            }
+        }
+        
+        function getRoleDisplayName(role) {
+            switch (role) {
+                case 'ADMIN': return '관리자';
+                case 'GUILD_MASTER': return '길드마스터';
+                case 'OFFICER': return '임원';
+                case 'MEMBER': return '회원';
+                default: return '게스트';
+            }
+        }
+        
+        async function loadBossRecords() {
+            try {
+                const result = await apiCall('getBossRecords');
+                
+                if (result.success) {
+                    bossRecordsData = result.data.records;
+                    displayBossRecords(bossRecordsData);
+                } else {
+                    showAlert('보스 기록을 불러올 수 없습니다.', 'danger');
+                }
+            } catch (error) {
+                console.error('보스 기록 로딩 오류:', error);
+            }
+        }
+        
+        function displayBossRecords(records) {
+            const tbody = document.getElementById('bossRecordsTableBody');
+            
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">보스 기록이 없습니다.</td></tr>';
+                return;
+            }
+            
+            const html = records.map(record => `
+                <tr>
+                    <td>${record.bossName}</td>
+                    <td>${record.participantNickname}</td>
+                    <td>${record.participantClass || '-'}</td>
+                    <td>${record.contribution.toLocaleString()}</td>
+                    <td>${formatDateTime(record.recordDate)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editBossRecord('${record.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            tbody.innerHTML = html;
+        }
+        
+        function loadStatistics() {
+            // TODO: Implement statistics loading
+        }
+        
+        function loadAdminPage() {
+            // TODO: Implement admin page loading
+        }
+        
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function openMemberModal(memberId = null) {
+            // TODO: Implement member modal
+            openModal('memberModal');
+        }
+        
+        function openBossRecordModal() {
+            // TODO: Implement boss record modal
+            openModal('bossRecordModal');
+        }
+        
+        function editMember(memberId) {
+            // TODO: Implement member editing
+            console.log('Edit member:', memberId);
+        }
+        
+        function editBossRecord(recordId) {
+            // TODO: Implement boss record editing
+            console.log('Edit boss record:', recordId);
+        }
+        
+        // Event listeners
+        document.getElementById('loginForm').addEventListener('submit', login);
+        
+        // Search functionality
+        document.getElementById('memberSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredMembers = membersData.filter(member => 
+                member.nickname.toLowerCase().includes(searchTerm) ||
+                member.email.toLowerCase().includes(searchTerm)
+            );
+            displayMembers(filteredMembers);
+        });
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for existing session
+            const savedSession = sessionStorage.getItem('userSession');
+            if (savedSession) {
+                // TODO: Validate session with server
+                // For now, just show login page
+            }
+            
+            // Set default date for boss record
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('recordDate').value = now.toISOString().slice(0, 16);
+        });
+        
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
