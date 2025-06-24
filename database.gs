@@ -416,7 +416,308 @@ const DatabaseUtils = {
     }
   },
   
-  // ===== 길드 자금 관련 DB 함수들 =====
+  // ===== 관리자용 보스 관리 =====
+  
+  // 보스 생성
+  createBoss: function(bossData, createdBy) {
+    try {
+      LogUtils.info('보스 생성 시작', { bossName: bossData.name, createdBy });
+      
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.BOSS_LIST);
+      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      
+      const newBoss = {
+        id: SecurityUtils.generateUUID(),
+        name: StringUtils.safeTrim(bossData.name),
+        type: bossData.type || BOSS_TYPES.CUSTOM,
+        difficulty: bossData.difficulty || DIFFICULTY_LEVELS.NORMAL,
+        maxParticipants: NumberUtils.toNumber(bossData.maxParticipants, 0),
+        description: StringUtils.safeTrim(bossData.description || ''),
+        isActive: bossData.isActive !== false,
+        createdBy: createdBy,
+        createdAt: DateUtils.now(),
+        updatedAt: DateUtils.now()
+      };
+      
+      const rowData = this.objectToRow(headers, newBoss);
+      sheet.appendRow(rowData);
+      
+      // 캐시 무효화
+      CacheUtils.remove(CACHE_KEYS.BOSS_LIST);
+      
+      LogUtils.info('보스 생성 완료', { bossId: newBoss.id, bossName: newBoss.name });
+      return newBoss;
+      
+    } catch (error) {
+      LogUtils.error('보스 생성 오류', { bossData, error });
+      throw error;
+    }
+  },
+  
+  // 보스 목록 조회
+  getBossList: function(activeOnly = true) {
+    try {
+      const cacheKey = `${CACHE_KEYS.BOSS_LIST}_${activeOnly}`;
+      const cached = CacheUtils.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.BOSS_LIST);
+      const data = sheet.getDataRange().getValues();
+      
+      if (data.length <= 1) {
+        return [];
+      }
+      
+      const headers = data[0];
+      const bosses = [];
+      
+      for (let i = 1; i < data.length; i++) {
+        const boss = this.rowToObject(headers, data[i]);
+        
+        if (activeOnly && !boss.isActive) continue;
+        
+        bosses.push(boss);
+      }
+      
+      // 이름순 정렬
+      bosses.sort((a, b) => a.name.localeCompare(b.name));
+      
+      CacheUtils.set(cacheKey, bosses, 300);
+      return bosses;
+      
+    } catch (error) {
+      LogUtils.error('보스 목록 조회 오류', { activeOnly, error });
+      return [];
+    }
+  },
+  
+  // 보스 수정
+  updateBoss: function(bossId, updateData, updatedBy) {
+    try {
+      LogUtils.info('보스 수정 시작', { bossId, updatedBy });
+      
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.BOSS_LIST);
+      const rowIndex = this.findRowIndex(sheet, 'id', bossId);
+      
+      if (rowIndex <= 0) {
+        throw new Error('수정할 보스를 찾을 수 없습니다.');
+      }
+      
+      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      const currentData = this.rowToObject(headers, sheet.getRange(rowIndex, 1, 1, headers.length).getValues()[0]);
+      
+      // 업데이트 데이터 병합
+      const updatedBoss = ObjectUtils.merge(currentData, updateData, {
+        updatedAt: DateUtils.now(),
+        updatedBy: updatedBy
+      });
+      
+      const rowData = this.objectToRow(headers, updatedBoss);
+      sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+      
+      // 캐시 무효화
+      CacheUtils.remove(CACHE_KEYS.BOSS_LIST);
+      
+      LogUtils.info('보스 수정 완료', { bossId });
+      return updatedBoss;
+      
+    } catch (error) {
+      LogUtils.error('보스 수정 오류', { bossId, updateData, error });
+      throw error;
+    }
+  },
+  
+  // 보스 삭제 (비활성화)
+  deleteBoss: function(bossId, deletedBy) {
+    try {
+      return this.updateBoss(bossId, { 
+        isActive: false,
+        deletedBy: deletedBy,
+        deletedAt: DateUtils.now()
+      }, deletedBy);
+    } catch (error) {
+      LogUtils.error('보스 삭제 오류', { bossId, error });
+      throw error;
+    }
+  },
+  
+  // ===== 관리자용 직업/클래스 관리 =====
+  
+  // 직업 생성
+  createClass: function(classData, createdBy) {
+    try {
+      LogUtils.info('직업 생성 시작', { className: classData.name, createdBy });
+      
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.CLASS_LIST);
+      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      
+      const newClass = {
+        id: SecurityUtils.generateUUID(),
+        name: StringUtils.safeTrim(classData.name),
+        type: StringUtils.safeTrim(classData.type || ''),
+        description: StringUtils.safeTrim(classData.description || ''),
+        isActive: classData.isActive !== false,
+        createdBy: createdBy,
+        createdAt: DateUtils.now(),
+        updatedAt: DateUtils.now()
+      };
+      
+      const rowData = this.objectToRow(headers, newClass);
+      sheet.appendRow(rowData);
+      
+      // 캐시 무효화
+      CacheUtils.remove('class_list');
+      
+      LogUtils.info('직업 생성 완료', { classId: newClass.id, className: newClass.name });
+      return newClass;
+      
+    } catch (error) {
+      LogUtils.error('직업 생성 오류', { classData, error });
+      throw error;
+    }
+  },
+  
+  // 직업 목록 조회
+  getClassList: function(activeOnly = true) {
+    try {
+      const cacheKey = `class_list_${activeOnly}`;
+      const cached = CacheUtils.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.CLASS_LIST);
+      const data = sheet.getDataRange().getValues();
+      
+      if (data.length <= 1) {
+        return [];
+      }
+      
+      const headers = data[0];
+      const classes = [];
+      
+      for (let i = 1; i < data.length; i++) {
+        const classInfo = this.rowToObject(headers, data[i]);
+        
+        if (activeOnly && !classInfo.isActive) continue;
+        
+        classes.push(classInfo);
+      }
+      
+      // 이름순 정렬
+      classes.sort((a, b) => a.name.localeCompare(b.name));
+      
+      CacheUtils.set(cacheKey, classes, 300);
+      return classes;
+      
+    } catch (error) {
+      LogUtils.error('직업 목록 조회 오류', { activeOnly, error });
+      return [];
+    }
+  },
+  
+  // ===== 게임 설정 관리 =====
+  
+  // 게임 설정 저장
+  saveGameSetting: function(key, value, description = '', type = 'STRING', updatedBy) {
+    try {
+      LogUtils.info('게임 설정 저장', { key, value, updatedBy });
+      
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.GAME_SETTINGS);
+      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      
+      // 기존 설정 확인
+      const existingRowIndex = this.findRowIndex(sheet, 'key', key);
+      
+      const settingData = {
+        key: key,
+        value: value,
+        description: description,
+        type: type,
+        updatedBy: updatedBy,
+        updatedAt: DateUtils.now()
+      };
+      
+      if (existingRowIndex > 0) {
+        // 기존 설정 업데이트
+        const rowData = this.objectToRow(headers, settingData);
+        sheet.getRange(existingRowIndex, 1, 1, rowData.length).setValues([rowData]);
+      } else {
+        // 새 설정 추가
+        const rowData = this.objectToRow(headers, settingData);
+        sheet.appendRow(rowData);
+      }
+      
+      // 캐시 무효화
+      CacheUtils.remove('game_settings');
+      
+      LogUtils.info('게임 설정 저장 완료', { key });
+      return settingData;
+      
+    } catch (error) {
+      LogUtils.error('게임 설정 저장 오류', { key, value, error });
+      throw error;
+    }
+  },
+  
+  // 게임 설정 조회
+  getGameSetting: function(key, defaultValue = null) {
+    try {
+      const cacheKey = 'game_settings';
+      let settings = CacheUtils.get(cacheKey);
+      
+      if (!settings) {
+        const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.GAME_SETTINGS);
+        const data = sheet.getDataRange().getValues();
+        
+        settings = {};
+        if (data.length > 1) {
+          const headers = data[0];
+          
+          for (let i = 1; i < data.length; i++) {
+            const setting = this.rowToObject(headers, data[i]);
+            settings[setting.key] = setting.value;
+          }
+        }
+        
+        CacheUtils.set(cacheKey, settings, 600); // 10분 캐시
+      }
+      
+      return settings[key] !== undefined ? settings[key] : defaultValue;
+      
+    } catch (error) {
+      LogUtils.error('게임 설정 조회 오류', { key, error });
+      return defaultValue;
+    }
+  },
+  
+  // 모든 게임 설정 조회
+  getAllGameSettings: function() {
+    try {
+      const sheet = this.getOrCreateSheet(SystemConfig.SHEET_NAMES.GAME_SETTINGS);
+      const data = sheet.getDataRange().getValues();
+      
+      if (data.length <= 1) {
+        return {};
+      }
+      
+      const headers = data[0];
+      const settings = {};
+      
+      for (let i = 1; i < data.length; i++) {
+        const setting = this.rowToObject(headers, data[i]);
+        settings[setting.key] = setting;
+      }
+      
+      return settings;
+      
+    } catch (error) {
+      LogUtils.error('모든 게임 설정 조회 오류', error);
+      return {};
+    }
+  },
   
   // 자금 거래 저장
   saveFundTransaction: function(transaction) {
