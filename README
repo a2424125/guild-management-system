@@ -1,0 +1,227 @@
+🎮 범용 게임 관리 시스템
+Google Apps Script 기반의 강력하고 유연한 게임 관리 플랫폼
+다양한 게임에 적용 가능한 범용 길드/팀 관리 시스템입니다. 보스 기록, 회원 관리, 통계 분석 등 게임 커뮤니티 운영에 필요한 모든 기능을 제공합니다.
+✨ 주요 기능
+🔐 인증 및 권한 관리
+
+안전한 로그인/로그아웃 시스템
+역할별 권한 제어 (관리자, 길드마스터, 임원, 일반회원)
+세션 관리 및 보안 강화
+
+👥 회원 관리
+
+회원 가입/정보 수정
+활성/비활성 회원 관리
+검색 및 필터링 기능
+회원별 활동 통계
+
+⚔️ 보스 기록 관리
+
+보스 참여 기록 생성/수정/삭제
+참여자별 기여도 추적
+날짜별/보스별 기록 조회
+참여 상태 관리 (참여/불참/지각/조퇴)
+
+📊 통계 및 분석
+
+주간/월간 참여 통계
+개인별 기여도 순위
+보스별 성과 분석
+시각적 대시보드
+
+🛠️ 관리자 기능
+
+보스 목록 관리 (추가/수정/삭제)
+직업/클래스 관리
+게임 설정 커스터마이징
+시스템 로그 관리
+
+💰 자금 관리 (개발 예정)
+
+길드 자금 추적
+분배 내역 관리
+거래 기록 보관
+
+🚀 빠른 시작
+1. Google Sheets 준비
+
+Google Sheets에서 새 스프레드시트 생성
+스프레드시트 ID를 복사 (URL에서 /d/ 뒤의 긴 문자열)
+
+2. Google Apps Script 설정
+
+Google Apps Script에서 새 프로젝트 생성
+프로젝트명을 "게임관리시스템"으로 변경
+
+3. 파일 업로드
+아래 순서대로 파일들을 생성하고 코드를 복사하세요:
+필수 설정 파일
+📁 config/
+├── settings.gs      # 시스템 설정
+└── constants.gs     # 상수 정의
+유틸리티 파일
+📁 utils/
+├── helpers.gs       # 공통 유틸리티
+└── database.gs      # 데이터베이스 관리
+인증 모듈
+📁 auth/
+└── authentication.gs # 인증 시스템
+기능 모듈
+📁 modules/
+├── admin.gs         # 관리자 기능
+├── members.gs       # 회원 관리
+└── boss.gs          # 보스 기록
+메인 및 프론트엔드
+📁 root/
+├── main.gs          # 메인 진입점
+📁 frontend/
+└── index.html       # 웹 UI
+4. 설정 업데이트
+config/settings.gs 파일에서 다음 설정을 변경하세요:
+javascript// 스프레드시트 ID 설정
+SPREADSHEET_ID: 'YOUR_SPREADSHEET_ID_HERE',
+
+// 게임 정보 커스터마이징
+SHEET_NAMES: {
+  MEMBERS: '회원정보',
+  BOSS_RECORDS: '보스참여기록',
+  // ... 필요에 따라 시트명 변경
+},
+
+// 비즈니스 규칙 조정
+BUSINESS_RULES: {
+  COMMISSION_RATE: 0.08,  // 수수료율
+  PASSWORD_MIN_LENGTH: 6, // 최소 비밀번호 길이
+  // ... 게임에 맞게 조정
+}
+5. 웹앱 배포
+
+Apps Script에서 배포 > 새 배포 클릭
+유형: 웹앱 선택
+실행 계정: 본인
+액세스 권한: 조직 내 사용자 또는 모든 사용자
+배포 클릭
+
+6. 초기 설정
+
+배포된 웹앱 URL 접속
+시스템이 자동으로 시트와 기본 관리자 계정 생성
+기본 관리자 계정으로 로그인:
+
+닉네임: admin
+비밀번호: Admin#2025!Safe
+
+
+
+🎯 게임별 커스터마이징
+보스 설정 예시
+⚔️ 던전 앤 파이터 (DNF)
+javascript// 보스 추가 예시
+보스명: "바칼 레이드"
+타입: "RAID"
+난이도: "HARD"
+최대 참여자: 8명
+🗡️ 로스트아크
+javascript보스명: "발탄 하드"
+타입: "RAID"  
+난이도: "HARD"
+최대 참여자: 8명
+🏹 메이플스토리
+javascript보스명: "루시드 하드"
+타입: "BOSS"
+난이도: "VERY_HARD"
+최대 참여자: 6명
+직업 설정 예시
+DNF 직업
+
+귀검사, 격투가, 거너, 마법사, 프리스트 등
+
+로스트아크 직업
+
+워리어, 마법사, 마샬아츠, 거너, 어새신 등
+
+메이플스토리 직업
+
+전사, 마법사, 궁수, 도적, 해적 등
+
+📋 시스템 요구사항
+
+Google Apps Script (무료)
+Google Sheets (무료)
+모던 웹 브라우저 (Chrome, Firefox, Safari, Edge)
+인터넷 연결
+
+🔧 고급 설정
+권한 시스템
+javascript// 역할별 권한 커스터마이징
+ROLE_PERMISSIONS: {
+  ADMIN: [...], // 모든 권한
+  GUILD_MASTER: [...], // 관리 권한
+  OFFICER: [...], // 제한된 관리 권한  
+  MEMBER: [...], // 기본 권한
+}
+게임 설정
+javascriptGAME_SETTINGS: {
+  GAME_NAME: '게임명',
+  MAX_PARTY_SIZE: 8,
+  CURRENCY_NAME: '골드',
+  TIMEZONE: 'Asia/Seoul'
+}
+UI 테마
+javascriptUI: {
+  THEME: {
+    PRIMARY_COLOR: '#00BCD4',
+    SECONDARY_COLOR: '#FFD54F', 
+    // ... 색상 커스터마이징
+  }
+}
+🛡️ 보안 기능
+
+해시화된 비밀번호 저장
+세션 기반 인증
+역할별 접근 제어
+입력값 검증 및 이스케이핑
+CSP(Content Security Policy) 적용
+
+📱 반응형 디자인
+
+모바일 최적화
+태블릿 지원
+데스크톱 완벽 호환
+PWA(Progressive Web App) 준비
+
+🔄 업데이트 및 백업
+자동 백업
+
+주간 자동 백업 기능
+스프레드시트 복사본 생성
+데이터 무결성 검증
+
+버전 관리
+javascriptVERSION: '1.0.0'
+BUILD_DATE: '2025-06-24'
+🤝 기여하기
+
+이 저장소를 Fork
+기능 브랜치 생성 (git checkout -b feature/amazing-feature)
+변경사항 커밋 (git commit -m 'Add amazing feature')
+브랜치에 Push (git push origin feature/amazing-feature)
+Pull Request 생성
+
+📞 지원 및 문의
+
+이슈 리포트: GitHub Issues 사용
+기능 요청: GitHub Discussions 사용
+보안 문제: Security Advisory 사용
+
+📄 라이선스
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 LICENSE 파일을 참조하세요.
+🙏 감사의 말
+
+Google Apps Script 플랫폼
+오픈소스 커뮤니티
+모든 기여자들
+
+
+⭐ 이 프로젝트가 도움이 되셨다면 Star를 눌러주세요!
+Made with ❤️ for Gaming Communities
