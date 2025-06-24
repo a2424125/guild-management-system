@@ -1,58 +1,50 @@
 /**
- * Ω√Ω∫≈€ ªÛºˆ ¡§¿«
- * ∏µÁ «œµÂƒ⁄µ˘µ» πÆ¿⁄ø≠∞˙ º˝¿⁄∏¶ ¡ﬂæ” ∞¸∏Æ
+ * ÏãúÏä§ÌÖú ÏÉÅÏàò Ï†ïÏùò
+ * Î™®Îì† ÌïòÎìúÏΩîÎî©Îêú Í∞íÍ≥º Ïó¥Í±∞ÌòïÏùÑ Ï§ëÏïô Í¥ÄÎ¶¨
  */
 
-// ===== ªÁøÎ¿⁄ ªÛ≈¬ ªÛºˆ =====
-const USER_STATUS = {
-  ACTIVE: '»∞º∫',
-  INACTIVE: '∫Ò»∞º∫',
-  SUSPENDED: '¡§¡ˆ',
-  DELETED: 'ªË¡¶'
+// ===== Ï†ïÍ∑úÌëúÌòÑÏãù Ìå®ÌÑ¥ =====
+const REGEX_PATTERNS = {
+  // ÎãâÎÑ§ÏûÑ: ÌïúÍ∏Ä, ÏòÅÎ¨∏, Ïà´Ïûê 2-20Ïûê
+  NICKNAME: /^[Í∞Ä-Ìû£a-zA-Z0-9]{2,20}$/,
+  
+  // Ïù¥Î©îÏùº Í≤ÄÏ¶ù
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  
+  // ÎπÑÎ∞ÄÎ≤àÌò∏: ÏòÅÎ¨∏+Ïà´Ïûê Ï°∞Ìï© 6Ïûê Ïù¥ÏÉÅ
+  PASSWORD: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/,
+  
+  // ÌïúÍµ≠Ïñ¥Îßå
+  KOREAN_ONLY: /^[Í∞Ä-Ìû£\s]+$/,
+  
+  // Ïà´ÏûêÎßå
+  NUMBER_ONLY: /^\d+$/,
+  
+  // Í∏àÏï° (Ïà´Ïûê + ÏΩ§Îßà)
+  CURRENCY: /^[\d,]+$/
 };
 
-// ===== ªÁøÎ¿⁄ ±««— ªÛºˆ =====
-const USER_ROLES = {
-  ADMIN: 'Y',
-  SUB_ADMIN: 'S',
-  MODERATOR: 'M',
-  MEMBER: 'N'
+// ===== ÎÇ†Ïßú Ìè¨Îß∑ =====
+const DATE_FORMATS = {
+  // Í∏∞Î≥∏ Ìè¨Îß∑
+  FULL: 'yyyy-MM-dd HH:mm:ss',
+  DATE_ONLY: 'yyyy-MM-dd',
+  TIME_ONLY: 'HH:mm:ss',
+  
+  // ÌëúÏãúÏö© Ìè¨Îß∑
+  DISPLAY_FULL: 'yyyyÎÖÑ MMÏõî ddÏùº HHÏãú mmÎ∂Ñ',
+  DISPLAY_DATE: 'yyyyÎÖÑ MMÏõî ddÏùº',
+  DISPLAY_TIME: 'HHÏãú mmÎ∂Ñ',
+  
+  // Í∞ÑÏÜå Ìè¨Îß∑
+  SHORT_DATE: 'MM/dd',
+  SHORT_DATETIME: 'MM/dd HH:mm',
+  
+  // ÏãúÏä§ÌÖú Î°úÍ∑∏Ïö©
+  LOG_FORMAT: 'yyyy-MM-dd HH:mm:ss.SSS'
 };
 
-// ===== ªÁøÎ¿⁄ ±««— ¿Ã∏ß =====
-const USER_ROLE_NAMES = {
-  [USER_ROLES.ADMIN]: '∞¸∏Æ¿⁄',
-  [USER_ROLES.SUB_ADMIN]: '∫Œ∞¸∏Æ¿⁄',
-  [USER_ROLES.MODERATOR]: 'øÓøµ¡¯',
-  [USER_ROLES.MEMBER]: '¿œπ›»∏ø¯'
-};
-
-// ===== ∫∏Ω∫/∑π¿ÃµÂ ªÛ≈¬ =====
-const BOSS_STATUS = {
-  ACTIVE: '»∞º∫',
-  INACTIVE: '∫Ò»∞º∫',
-  MAINTENANCE: '¡°∞À¡ﬂ'
-};
-
-// ===== æ∆¿Ã≈€ ∆«∏≈ ªÛ≈¬ =====
-const SALE_STATUS = {
-  UNSOLD: 'πÃ∆«∏≈',
-  SOLD: '∆«∏≈øœ∑·',
-  RESERVED: '∆«∏≈øπæ‡',
-  CANCELLED: '∆«∏≈√Îº“'
-};
-
-// ===== ∞≈∑° ¿Ø«¸ =====
-const TRANSACTION_TYPES = {
-  DEPOSIT: '¿‘±›',
-  WITHDRAWAL: '√‚±›',
-  ITEM_SALE: 'æ∆¿Ã≈€∆«∏≈',
-  DISTRIBUTION: '¡÷±ﬁ∫–πË',
-  COMMISSION: 'ºˆºˆ∑·',
-  ADJUSTMENT: '¡∂¡§'
-};
-
-// ===== ∑Œ±◊ ∑π∫ß =====
+// ===== Î°úÍ∑∏ Î†àÎ≤® =====
 const LOG_LEVELS = {
   DEBUG: 'DEBUG',
   INFO: 'INFO',
@@ -61,166 +53,158 @@ const LOG_LEVELS = {
   FATAL: 'FATAL'
 };
 
-// ===== ∏ﬁΩ√¡ˆ ªÛºˆ =====
-const MESSAGES = {
-  // º∫∞¯ ∏ﬁΩ√¡ˆ
-  SUCCESS: {
-    LOGIN: '∑Œ±◊¿Œµ«æ˙Ω¿¥œ¥Ÿ.',
-    LOGOUT: '∑Œ±◊æ∆øÙµ«æ˙Ω¿¥œ¥Ÿ.',
-    REGISTER: '»∏ø¯∞°¿‘¿Ã øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.',
-    PASSWORD_CHANGED: '∫Òπ–π¯»£∞° ∫Ø∞Êµ«æ˙Ω¿¥œ¥Ÿ.',
-    DATA_SAVED: 'µ•¿Ã≈Õ∞° ¿˙¿Âµ«æ˙Ω¿¥œ¥Ÿ.',
-    DATA_UPDATED: 'µ•¿Ã≈Õ∞° æ˜µ•¿Ã∆Æµ«æ˙Ω¿¥œ¥Ÿ.',
-    DATA_DELETED: 'µ•¿Ã≈Õ∞° ªË¡¶µ«æ˙Ω¿¥œ¥Ÿ.',
-    MEMBER_ADDED: '»∏ø¯¿Ã √ﬂ∞°µ«æ˙Ω¿¥œ¥Ÿ.',
-    BOSS_RECORD_SAVED: '∫∏Ω∫ ¬¸ø© ±‚∑œ¿Ã ¿˙¿Âµ«æ˙Ω¿¥œ¥Ÿ.',
-    ITEM_SOLD: 'æ∆¿Ã≈€¿Ã ∆«∏≈µ«æ˙Ω¿¥œ¥Ÿ.',
-    FUNDS_UPDATED: '±ÊµÂ ¿⁄±›¿Ã æ˜µ•¿Ã∆Æµ«æ˙Ω¿¥œ¥Ÿ.',
-    DISTRIBUTION_COMPLETED: '¡÷±ﬁ ∫–πË∞° øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.',
-    BACKUP_CREATED: 'πÈæ˜¿Ã ª˝º∫µ«æ˙Ω¿¥œ¥Ÿ.',
-    CACHE_CLEARED: 'ƒ≥Ω√∞° √ ±‚»≠µ«æ˙Ω¿¥œ¥Ÿ.'
-  },
+// ===== Ï∫êÏãú ÌÇ§ =====
+const CACHE_KEYS = {
+  // ÏÇ¨Ïö©Ïûê ÏÑ∏ÏÖò
+  USER_SESSION: 'user_session_',
+  USER_PERMISSIONS: 'user_permissions_',
   
-  // ø¿∑˘ ∏ﬁΩ√¡ˆ
-  ERROR: {
-    // ¿Œ¡ı ∞¸∑√
-    INVALID_CREDENTIALS: '¥–≥◊¿” ∂«¥¬ ∫Òπ–π¯»£∞° ¿œƒ°«œ¡ˆ æ Ω¿¥œ¥Ÿ.',
-    USER_NOT_FOUND: 'ªÁøÎ¿⁄∏¶ √£¿ª ºˆ æ¯Ω¿¥œ¥Ÿ.',
-    USER_INACTIVE: '∫Ò»∞º∫»≠µ» ªÁøÎ¿⁄¿‘¥œ¥Ÿ.',
-    SESSION_EXPIRED: 'ººº«¿Ã ∏∏∑·µ«æ˙Ω¿¥œ¥Ÿ. ¥ŸΩ√ ∑Œ±◊¿Œ«ÿ¡÷ººø‰.',
-    PERMISSION_DENIED: '±««—¿Ã æ¯Ω¿¥œ¥Ÿ.',
-    
-    // µ•¿Ã≈Õ ∞À¡ı
-    REQUIRED_FIELD: '« ºˆ «◊∏Ò¿Ã ¥©∂Ùµ«æ˙Ω¿¥œ¥Ÿ.',
-    INVALID_FORMAT: '¿ﬂ∏¯µ» «¸Ωƒ¿‘¥œ¥Ÿ.',
-    DUPLICATE_NICKNAME: '¿ÃπÃ ¡∏¿Á«œ¥¬ ¥–≥◊¿”¿‘¥œ¥Ÿ.',
-    PASSWORD_TOO_SHORT: '∫Òπ–π¯»£¥¬ 6¿⁄ ¿ÃªÛ¿ÃæÓæﬂ «’¥œ¥Ÿ.',
-    PASSWORD_MISMATCH: '∫Òπ–π¯»£∞° ¿œƒ°«œ¡ˆ æ Ω¿¥œ¥Ÿ.',
-    NICKNAME_TOO_SHORT: '¥–≥◊¿”¿∫ 2¿⁄ ¿ÃªÛ¿ÃæÓæﬂ «’¥œ¥Ÿ.',
-    NICKNAME_TOO_LONG: '¥–≥◊¿”¿∫ 20¿⁄ ¿Ã«œø©æﬂ «’¥œ¥Ÿ.',
-    
-    // Ω√Ω∫≈€ ø¿∑˘
-    SYSTEM_ERROR: 'Ω√Ω∫≈€ ø¿∑˘∞° πﬂª˝«ﬂΩ¿¥œ¥Ÿ.',
-    DATABASE_ERROR: 'µ•¿Ã≈Õ∫£¿ÃΩ∫ ø¿∑˘∞° πﬂª˝«ﬂΩ¿¥œ¥Ÿ.',
-    NETWORK_ERROR: '≥◊∆Æøˆ≈© ø¿∑˘∞° πﬂª˝«ﬂΩ¿¥œ¥Ÿ.',
-    FILE_NOT_FOUND: '∆ƒ¿œ¿ª √£¿ª ºˆ æ¯Ω¿¥œ¥Ÿ.',
-    SHEET_NOT_FOUND: 'Ω√∆Æ∏¶ √£¿ª ºˆ æ¯Ω¿¥œ¥Ÿ.',
-    INVALID_DATA: '¿ﬂ∏¯µ» µ•¿Ã≈Õ¿‘¥œ¥Ÿ.',
-    
-    // ∫Ò¡Ó¥œΩ∫ ∑Œ¡˜
-    INSUFFICIENT_FUNDS: '±ÊµÂ ¿⁄±›¿Ã ∫Œ¡∑«’¥œ¥Ÿ.',
-    ITEM_ALREADY_SOLD: '¿ÃπÃ ∆«∏≈µ» æ∆¿Ã≈€¿‘¥œ¥Ÿ.',
-    BOSS_RECORD_EXISTS: '¿ÃπÃ µÓ∑œµ» ∫∏Ω∫ ±‚∑œ¿‘¥œ¥Ÿ.',
-    INVALID_AMOUNT: '¿ﬂ∏¯µ» ±›æ◊¿‘¥œ¥Ÿ.',
-    FUTURE_DATE: 'πÃ∑° ≥Ø¬•¥¬ º±≈√«“ ºˆ æ¯Ω¿¥œ¥Ÿ.'
-  },
+  // Îç∞Ïù¥ÌÑ∞ Ï∫êÏãú
+  MEMBERS_LIST: 'members_list',
+  BOSS_RECORDS: 'boss_records_',
+  GUILD_FUNDS: 'guild_funds',
+  WEEKLY_STATS: 'weekly_stats_',
   
-  // »Æ¿Œ ∏ﬁΩ√¡ˆ
-  CONFIRM: {
-    DELETE: '¡§∏ª ªË¡¶«œΩ√∞⁄Ω¿¥œ±Ó?',
-    LOGOUT: '∑Œ±◊æ∆øÙ«œΩ√∞⁄Ω¿¥œ±Ó?',
-    PASSWORD_CHANGE: '∫Òπ–π¯»£∏¶ ∫Ø∞Ê«œΩ√∞⁄Ω¿¥œ±Ó?',
-    MEMBER_DELETE: '»∏ø¯¿ª ªË¡¶«œΩ√∞⁄Ω¿¥œ±Ó?',
-    BOSS_RECORD_DELETE: '∫∏Ω∫ ±‚∑œ¿ª ªË¡¶«œΩ√∞⁄Ω¿¥œ±Ó?',
-    DISTRIBUTION_EXECUTE: '¡÷±ﬁ ∫–πË∏¶ Ω««‡«œΩ√∞⁄Ω¿¥œ±Ó?',
-    BACKUP_CREATE: 'πÈæ˜¿ª ª˝º∫«œΩ√∞⁄Ω¿¥œ±Ó?',
-    CACHE_CLEAR: 'ƒ≥Ω√∏¶ √ ±‚»≠«œΩ√∞⁄Ω¿¥œ±Ó?',
-    SYSTEM_RESET: 'Ω√Ω∫≈€¿ª √ ±‚»≠«œΩ√∞⁄Ω¿¥œ±Ó? ¿Ã ¿€æ˜¿∫ µ«µπ∏± ºˆ æ¯Ω¿¥œ¥Ÿ.'
-  }
+  // ÏãúÏä§ÌÖú Ï∫êÏãú
+  SYSTEM_CONFIG: 'system_config',
+  BOSS_LIST: 'boss_list',
+  PERMISSIONS: 'permissions_cache'
 };
 
-// ===== ∑ŒΩ∫∆Ææ∆≈© º≠πˆ ∏Ò∑œ =====
-const LOSTARK_SERVERS = [
-  '∑Á∆‰ø¬', 'Ω«∏Ææ»', 'æ∆∏∏', 'ƒ´∏∂¿Œ', 'ƒ´¡¶∑ŒΩ∫', 
-  'æ∆∫Í∑ºΩ¥µÂ', 'ƒ´¥‹', '¥œ≥™∫Í', '∫£∏•', 'πŸ∏£ƒ≠', 
-  '≈‰≈‰¿Ã≈©', 'ø°≈∞µÂ≥™', '≥◊∏Ææ∆', '≈∞∏Æ¥Ÿ'
-];
-
-// ===== ∑ŒΩ∫∆Ææ∆≈© ¡˜æ˜ ∏Ò∑œ =====
-const LOSTARK_JOBS = {
-  WARRIOR: {
-    name: '¿¸ªÁ',
-    jobs: ['πˆº≠ƒø', 'µΩ∫∆Æ∑Œ¿ÃæÓ', 'øˆ∑ŒµÂ', '»¶∏Æ≥™¿Ã∆Æ', 'ΩΩ∑π¿ÃæÓ']
-  },
-  MARTIAL_ARTIST: {
-    name: 'π´µµ∞°',
-    jobs: ['πË∆≤∏∂Ω∫≈Õ', '¿Œ∆ƒ¿Ã≈Õ', '±‚∞¯ªÁ', '√¢º˙ªÁ', 'Ω∫∆Æ∂Û¿Ãƒø', '∫Í∑π¿Ãƒø']
-  },
-  GUNNER: {
-    name: '∞«≥ ',
-    jobs: ['∞«ΩΩ∏µæÓ', 'æ∆∏£∆ºΩ∫∆Æ', 'µ•∫Ù«Â≈Õ', '∫Ì∑°Ω∫≈Õ', '»£≈©æ∆¿Ã', 'Ω∫ƒ´øÏ≈Õ']
-  },
-  MAGE: {
-    name: '∏∂π˝ªÁ',
-    jobs: ['πŸµÂ', 'º≠∏”≥ ', 'æ∆∏£ƒ´≥™', 'º“º≠∏ÆΩ∫']
-  },
-  ASSASSIN: {
-    name: 'æœªÏ¿⁄',
-    jobs: ['∫Ì∑π¿ÃµÂ', 'µ•∏¥–', '∏Æ∆€', 'º“øÔ¿Ã≈Õ']
-  },
-  SPECIALIST: {
-    name: 'Ω∫∆‰º»∏ÆΩ∫∆Æ',
-    jobs: ['µµ»≠∞°', '±‚ªÛº˙ªÁ']
-  }
+// ===== ÏÇ¨Ïö©Ïûê Í∂åÌïú =====
+const USER_ROLES = {
+  ADMIN: 'ADMIN',           // ÏµúÍ≥† Í¥ÄÎ¶¨Ïûê
+  GUILD_MASTER: 'GUILD_MASTER',   // Í∏∏ÎìúÎßàÏä§ÌÑ∞
+  OFFICER: 'OFFICER',       // ÏûÑÏõê
+  MEMBER: 'MEMBER',         // ÏùºÎ∞ò ÌöåÏõê
+  GUEST: 'GUEST'           // Í≤åÏä§Ìä∏
 };
 
-// ===== ¡˜æ˜∫∞ ªˆªÛ =====
-const JOB_COLORS = {
-  // ¿¸ªÁ
-  'πˆº≠ƒø': '#E53E3E',
-  'µΩ∫∆Æ∑Œ¿ÃæÓ': '#C53030',
-  'øˆ∑ŒµÂ': '#9B2C2C',
-  '»¶∏Æ≥™¿Ã∆Æ': '#742A2A',
-  'ΩΩ∑π¿ÃæÓ': '#E53E3E',
+// ===== Í∂åÌïúÎ≥Ñ Í∏∞Îä• =====
+const PERMISSIONS = {
+  // ÌöåÏõê Í¥ÄÎ¶¨
+  MEMBER_CREATE: 'MEMBER_CREATE',
+  MEMBER_READ: 'MEMBER_READ',
+  MEMBER_UPDATE: 'MEMBER_UPDATE',
+  MEMBER_DELETE: 'MEMBER_DELETE',
   
-  // π´µµ∞°
-  'πË∆≤∏∂Ω∫≈Õ': '#DD6B20',
-  '¿Œ∆ƒ¿Ã≈Õ': '#C05621',
-  '±‚∞¯ªÁ': '#9C4221',
-  '√¢º˙ªÁ': '#7B341E',
-  'Ω∫∆Æ∂Û¿Ãƒø': '#DD6B20',
-  '∫Í∑π¿Ãƒø': '#C05621',
+  // Î≥¥Ïä§ Í∏∞Î°ù Í¥ÄÎ¶¨
+  BOSS_RECORD_CREATE: 'BOSS_RECORD_CREATE',
+  BOSS_RECORD_READ: 'BOSS_RECORD_READ',
+  BOSS_RECORD_UPDATE: 'BOSS_RECORD_UPDATE',
+  BOSS_RECORD_DELETE: 'BOSS_RECORD_DELETE',
   
-  // ∞«≥ 
-  '∞«ΩΩ∏µæÓ': '#38A169',
-  'æ∆∏£∆ºΩ∫∆Æ': '#2F855A',
-  'µ•∫Ù«Â≈Õ': '#276749',
-  '∫Ì∑°Ω∫≈Õ': '#22543D',
-  '»£≈©æ∆¿Ã': '#1A202C',
-  'Ω∫ƒ´øÏ≈Õ': '#38A169',
+  // ÏûêÍ∏à Í¥ÄÎ¶¨
+  FUND_READ: 'FUND_READ',
+  FUND_MANAGE: 'FUND_MANAGE',
+  FUND_DISTRIBUTE: 'FUND_DISTRIBUTE',
   
-  // ∏∂π˝ªÁ
-  'πŸµÂ': '#3182CE',
-  'º≠∏”≥ ': '#2B6CB0',
-  'æ∆∏£ƒ´≥™': '#2C5282',
-  'º“º≠∏ÆΩ∫': '#2A4365',
+  // ÏãúÏä§ÌÖú Í¥ÄÎ¶¨
+  SYSTEM_CONFIG: 'SYSTEM_CONFIG',
+  USER_MANAGE: 'USER_MANAGE',
+  LOG_VIEW: 'LOG_VIEW',
   
-  // æœªÏ¿⁄
-  '∫Ì∑π¿ÃµÂ': '#805AD5',
-  'µ•∏¥–': '#6B46C1',
-  '∏Æ∆€': '#553C9A',
-  'º“øÔ¿Ã≈Õ': '#44337A',
-  
-  // Ω∫∆‰º»∏ÆΩ∫∆Æ
-  'µµ»≠∞°': '#D69E2E',
-  '±‚ªÛº˙ªÁ': '#00B5D8'
+  // ÌÜµÍ≥Ñ Ï°∞Ìöå
+  STATS_VIEW: 'STATS_VIEW',
+  STATS_EXPORT: 'STATS_EXPORT'
 };
 
-// ===== ∫∏Ω∫ ∏Ò∑œ =====
-const BOSS_LIST = [
-  'πﬂ≈∫', '∫Òæ∆≈∞Ω∫', 'ƒÌ≈©ºº¿Ã∆∞', 'æ∆∫Í∑ºΩ¥µÂ', '¿œ∏Ææ∆ƒ≠', 
-  'ƒ´æÁ∞÷', 'ªÛæ∆≈æ', 'ƒ´∏‡', 'ø°≈∞µÂ≥™', '∫£»˜∏Ω∫',
-  '»•µ∑¿« ªÛæ∆≈æ', '∆Æ∏ÆΩ√ø¬', 'ƒÌ∏£¿‹'
-];
+// ===== Ïó≠Ìï†Î≥Ñ Í∂åÌïú Îß§Ìïë =====
+const ROLE_PERMISSIONS = {
+  [USER_ROLES.ADMIN]: [
+    // Î™®Îì† Í∂åÌïú
+    ...Object.values(PERMISSIONS)
+  ],
+  
+  [USER_ROLES.GUILD_MASTER]: [
+    PERMISSIONS.MEMBER_READ,
+    PERMISSIONS.MEMBER_UPDATE,
+    PERMISSIONS.BOSS_RECORD_CREATE,
+    PERMISSIONS.BOSS_RECORD_READ,
+    PERMISSIONS.BOSS_RECORD_UPDATE,
+    PERMISSIONS.FUND_READ,
+    PERMISSIONS.FUND_MANAGE,
+    PERMISSIONS.FUND_DISTRIBUTE,
+    PERMISSIONS.STATS_VIEW,
+    PERMISSIONS.STATS_EXPORT
+  ],
+  
+  [USER_ROLES.OFFICER]: [
+    PERMISSIONS.MEMBER_READ,
+    PERMISSIONS.BOSS_RECORD_CREATE,
+    PERMISSIONS.BOSS_RECORD_READ,
+    PERMISSIONS.BOSS_RECORD_UPDATE,
+    PERMISSIONS.FUND_READ,
+    PERMISSIONS.STATS_VIEW
+  ],
+  
+  [USER_ROLES.MEMBER]: [
+    PERMISSIONS.MEMBER_READ,
+    PERMISSIONS.BOSS_RECORD_READ,
+    PERMISSIONS.FUND_READ,
+    PERMISSIONS.STATS_VIEW
+  ],
+  
+  [USER_ROLES.GUEST]: [
+    PERMISSIONS.MEMBER_READ,
+    PERMISSIONS.STATS_VIEW
+  ]
+};
 
-// ===== æ∆¿Ã≈€ ∏Ò∑œ =====
-const ITEM_LIST = [
-  '∏∂ºˆ¿« ª¿', '±§±‚¿« µπ', '∆ƒ∏Í¿« µπ', '¡˙º≠¿« µπ', 'ƒ´ø¿Ω∫ µπ',
-  'Ω≈∫Ò«— ∫∏ºÆ', 'øµ»•¿« ∞·¡§', '∞¢¿Œº≠', 'æÓ∫Ù∏Æ∆º Ω∫≈Ê',
-  'æ◊ººº≠∏Æ', 'π´±‚', 'πÊæÓ±∏', '∞ÒµÂ'
-];
+// ===== Î≥¥Ïä§ Í¥ÄÎ†® (Î≤îÏö©) =====
+const BOSS_TYPES = {
+  RAID: 'RAID',
+  DUNGEON: 'DUNGEON', 
+  WORLD: 'WORLD',
+  EVENT: 'EVENT',
+  CUSTOM: 'CUSTOM'
+};
 
-// ===== HTTP ªÛ≈¬ ƒ⁄µÂ =====
+// ===== ÎÇúÏù¥ÎèÑ (Î≤îÏö©) =====
+const DIFFICULTY_LEVELS = {
+  VERY_EASY: 'VERY_EASY',
+  EASY: 'EASY',
+  NORMAL: 'NORMAL', 
+  HARD: 'HARD',
+  VERY_HARD: 'VERY_HARD',
+  EXTREME: 'EXTREME',
+  CUSTOM: 'CUSTOM'
+};
+
+// ===== Í≤åÏûÑ ÏÑ§Ï†ï ÌÉÄÏûÖ =====
+const GAME_SETTINGS = {
+  GAME_NAME: 'GAME_NAME',
+  MAX_PARTY_SIZE: 'MAX_PARTY_SIZE',
+  CURRENCY_NAME: 'CURRENCY_NAME',
+  TIMEZONE: 'TIMEZONE',
+  CUSTOM_FIELDS: 'CUSTOM_FIELDS'
+};
+
+// ===== Ï∞∏Ïó¨ ÏÉÅÌÉú =====
+const PARTICIPATION_STATUS = {
+  ATTENDED: 'ATTENDED',      // Ï∞∏Ïó¨
+  ABSENT: 'ABSENT',          // Î∂àÏ∞∏
+  LATE: 'LATE',              // ÏßÄÍ∞Å
+  EARLY_LEAVE: 'EARLY_LEAVE' // Ï°∞Ìá¥
+};
+
+// ===== ÏûêÍ∏à Í±∞Îûò Ïú†Ìòï =====
+const TRANSACTION_TYPES = {
+  INCOME: 'INCOME',           // ÏàòÏûÖ
+  EXPENSE: 'EXPENSE',         // ÏßÄÏ∂ú
+  DISTRIBUTION: 'DISTRIBUTION', // Î∂ÑÎ∞∞
+  ADJUSTMENT: 'ADJUSTMENT'    // Ï°∞Ï†ï
+};
+
+// ===== Î∂ÑÎ∞∞ Î∞©Ïãù =====
+const DISTRIBUTION_METHODS = {
+  EQUAL: 'EQUAL',                    // Í∑†Îì± Î∂ÑÎ∞∞
+  PARTICIPATION_BASED: 'PARTICIPATION_BASED', // Ï∞∏Ïó¨ÎèÑ Í∏∞Î∞ò
+  CONTRIBUTION_BASED: 'CONTRIBUTION_BASED',   // Í∏∞Ïó¨ÎèÑ Í∏∞Î∞ò
+  CUSTOM: 'CUSTOM'                   // Ïª§Ïä§ÌÖÄ
+};
+
+// ===== HTTP ÏÉÅÌÉú ÏΩîÎìú =====
 const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -228,156 +212,147 @@ const HTTP_STATUS = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500
+  CONFLICT: 409,
+  INTERNAL_ERROR: 500
 };
 
-// ===== ¡§±‘Ωƒ ∆–≈œ =====
-const REGEX_PATTERNS = {
-  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  NICKNAME: /^[∞°-∆Ra-zA-Z0-9_-]{2,20}$/,
-  PASSWORD: /^.{6,}$/,
-  PHONE: /^01[0-9]-?[0-9]{4}-?[0-9]{4}$/,
-  NUMBER: /^\d+$/,
-  CURRENCY: /^\d{1,3}(,\d{3})*$/
+// ===== API ÏùëÎãµ ÏΩîÎìú =====
+const RESPONSE_CODES = {
+  SUCCESS: 'SUCCESS',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
+  AUTHORIZATION_ERROR: 'AUTHORIZATION_ERROR',
+  NOT_FOUND: 'NOT_FOUND',
+  DUPLICATE_ERROR: 'DUPLICATE_ERROR',
+  SYSTEM_ERROR: 'SYSTEM_ERROR'
 };
 
-// ===== ≥Ø¬• «¸Ωƒ =====
-const DATE_FORMATS = {
-  FULL: 'yyyy-MM-dd HH:mm:ss',
-  DATE_ONLY: 'yyyy-MM-dd',
-  TIME_ONLY: 'HH:mm:ss',
-  DISPLAY: 'MMø˘ dd¿œ',
-  DISPLAY_FULL: 'yyyy≥‚ MMø˘ dd¿œ',
-  ISO: 'yyyy-MM-ddTHH:mm:ss.SSSZ'
+// ===== Î©îÏãúÏßÄ ÌÖúÌîåÎ¶ø =====
+const MESSAGES = {
+  // ÏÑ±Í≥µ Î©îÏãúÏßÄ
+  SUCCESS: {
+    LOGIN: 'Î°úÍ∑∏Ïù∏ÎêòÏóàÏäµÎãàÎã§.',
+    LOGOUT: 'Î°úÍ∑∏ÏïÑÏõÉÎêòÏóàÏäµÎãàÎã§.',
+    REGISTER: 'ÌöåÏõêÍ∞ÄÏûÖÏù¥ ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.',
+    UPDATE: 'Ï†ïÎ≥¥Í∞Ä ÏóÖÎç∞Ïù¥Ìä∏ÎêòÏóàÏäµÎãàÎã§.',
+    DELETE: 'ÏÇ≠Ï†úÎêòÏóàÏäµÎãàÎã§.',
+    CREATE: 'ÏÉùÏÑ±ÎêòÏóàÏäµÎãàÎã§.'
+  },
+  
+  // Ïò§Î•ò Î©îÏãúÏßÄ
+  ERROR: {
+    INVALID_CREDENTIALS: 'ÏïÑÏù¥Îîî ÎòêÎäî ÎπÑÎ∞ÄÎ≤àÌò∏Í∞Ä Ïò¨Î∞îÎ•¥ÏßÄ ÏïäÏäµÎãàÎã§.',
+    PERMISSION_DENIED: 'Í∂åÌïúÏù¥ ÏóÜÏäµÎãàÎã§.',
+    NOT_FOUND: 'ÏöîÏ≤≠Ìïú Îç∞Ïù¥ÌÑ∞Î•º Ï∞æÏùÑ Ïàò ÏóÜÏäµÎãàÎã§.',
+    DUPLICATE_ENTRY: 'Ïù¥ÎØ∏ Ï°¥Ïû¨ÌïòÎäî Îç∞Ïù¥ÌÑ∞ÏûÖÎãàÎã§.',
+    VALIDATION_FAILED: 'ÏûÖÎ†•Í∞íÏù¥ Ïò¨Î∞îÎ•¥ÏßÄ ÏïäÏäµÎãàÎã§.',
+    SYSTEM_ERROR: 'ÏãúÏä§ÌÖú Ïò§Î•òÍ∞Ä Î∞úÏÉùÌñàÏäµÎãàÎã§.',
+    SESSION_EXPIRED: 'ÏÑ∏ÏÖòÏù¥ ÎßåÎ£åÎêòÏóàÏäµÎãàÎã§.'
+  },
+  
+  // Í≤ÄÏ¶ù Î©îÏãúÏßÄ
+  VALIDATION: {
+    REQUIRED: 'ÌïÑÏàò ÏûÖÎ†• Ìï≠Î™©ÏûÖÎãàÎã§.',
+    INVALID_FORMAT: 'Ïò¨Î∞îÎ•∏ ÌòïÏãùÏù¥ ÏïÑÎãôÎãàÎã§.',
+    TOO_SHORT: 'ÎÑàÎ¨¥ ÏßßÏäµÎãàÎã§.',
+    TOO_LONG: 'ÎÑàÎ¨¥ ÍπÅÎãàÎã§.',
+    INVALID_RANGE: 'ÌóàÏö© Î≤îÏúÑÎ•º Î≤óÏñ¥ÎÇ¨ÏäµÎãàÎã§.'
+  }
 };
 
-// ===== ≈Î∞Ë ±‚∞£ =====
-const STATISTICS_PERIODS = {
-  DAILY: 'daily',
-  WEEKLY: 'weekly',
-  MONTHLY: 'monthly',
-  QUARTERLY: 'quarterly',
-  YEARLY: 'yearly'
+// ===== ÏãúÏä§ÌÖú Ïù¥Î≤§Ìä∏ =====
+const SYSTEM_EVENTS = {
+  USER_LOGIN: 'USER_LOGIN',
+  USER_LOGOUT: 'USER_LOGOUT',
+  USER_REGISTER: 'USER_REGISTER',
+  BOSS_RECORD_CREATED: 'BOSS_RECORD_CREATED',
+  FUND_DISTRIBUTED: 'FUND_DISTRIBUTED',
+  SYSTEM_ERROR: 'SYSTEM_ERROR'
 };
 
-// ===== ¡§∑ƒ πÊ«‚ =====
-const SORT_DIRECTIONS = {
-  ASC: 'asc',
-  DESC: 'desc'
+// ===== UI ÏÉÅÏàò =====
+const UI_CONSTANTS = {
+  // Î™®Îã¨ ÌÅ¨Í∏∞
+  MODAL_SIZES: {
+    SMALL: { width: 400, height: 300 },
+    MEDIUM: { width: 600, height: 400 },
+    LARGE: { width: 800, height: 600 },
+    EXTRA_LARGE: { width: 1000, height: 700 }
+  },
+  
+  // ÌÖåÏù¥Î∏î ÏÑ§Ï†ï
+  TABLE: {
+    DEFAULT_PAGE_SIZE: 20,
+    MAX_PAGE_SIZE: 100,
+    COLUMN_MIN_WIDTH: 80,
+    COLUMN_MAX_WIDTH: 300
+  },
+  
+  // Ìèº ÏÑ§Ï†ï
+  FORM: {
+    INPUT_MAX_LENGTH: 255,
+    TEXTAREA_MAX_LENGTH: 1000,
+    SELECT_MAX_OPTIONS: 50
+  }
 };
 
-// ===== ∆‰¿Ã¡ˆ ≈©±‚ ø…º« =====
-const PAGE_SIZES = [10, 25, 50, 100];
-
-// ===== ƒ≥Ω√ ≈∞ =====
-const CACHE_KEYS = {
-  MEMBERS: 'guild_members',
-  BOSS_STATISTICS: 'boss_statistics',
-  GUILD_BALANCE: 'guild_balance',
-  USER_SESSION: 'user_session_',
-  BOSS_RECORDS: 'boss_records',
-  STATISTICS: 'statistics_',
-  SYSTEM_STATUS: 'system_status'
+// ===== Í∏∞Î≥∏Í∞í =====
+const DEFAULTS = {
+  // ÏÇ¨Ïö©Ïûê Í∏∞Î≥∏Í∞í
+  USER: {
+    ROLE: USER_ROLES.MEMBER,
+    STATUS: 'ACTIVE',
+    JOIN_DATE: () => new Date(),
+    LAST_LOGIN: null
+  },
+  
+  // Î≥¥Ïä§ Í∏∞Î°ù Í∏∞Î≥∏Í∞í
+  BOSS_RECORD: {
+    PARTICIPATION: PARTICIPATION_STATUS.ATTENDED,
+    CONTRIBUTION: 0,
+    NOTES: ''
+  },
+  
+  // ÌéòÏù¥Ïßï Í∏∞Î≥∏Í∞í
+  PAGINATION: {
+    PAGE: 1,
+    SIZE: 20,
+    SORT: 'created_date',
+    ORDER: 'DESC'
+  }
 };
 
-// ===== ¿Ã∫•∆Æ ≈∏¿‘ =====
-const EVENT_TYPES = {
-  USER_LOGIN: 'user_login',
-  USER_LOGOUT: 'user_logout',
-  USER_REGISTER: 'user_register',
-  PASSWORD_CHANGE: 'password_change',
-  MEMBER_ADDED: 'member_added',
-  MEMBER_UPDATED: 'member_updated',
-  MEMBER_DELETED: 'member_deleted',
-  BOSS_RECORD_ADDED: 'boss_record_added',
-  ITEM_SOLD: 'item_sold',
-  FUNDS_UPDATED: 'funds_updated',
-  DISTRIBUTION_EXECUTED: 'distribution_executed',
-  SYSTEM_ERROR: 'system_error',
-  DATA_BACKUP: 'data_backup'
-};
-
-// ===== CSS ≈¨∑°Ω∫ ¿Ã∏ß =====
-const CSS_CLASSES = {
-  // ªÛ≈¬ ∞¸∑√
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
-  DISABLED: 'disabled',
-  LOADING: 'loading',
-  ERROR: 'error',
-  SUCCESS: 'success',
-  WARNING: 'warning',
+// ===== Í≤ÄÏ¶ù Í∑úÏπô =====
+const VALIDATION_RULES = {
+  NICKNAME: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 20,
+    PATTERN: REGEX_PATTERNS.NICKNAME,
+    REQUIRED: true
+  },
   
-  // ƒƒ∆˜≥Õ∆Æ
-  MODAL: 'modal',
-  TOOLTIP: 'tooltip',
-  DROPDOWN: 'dropdown',
-  TAB: 'tab',
-  CARD: 'card',
-  BUTTON: 'btn',
-  FORM: 'form',
-  TABLE: 'table',
+  PASSWORD: {
+    MIN_LENGTH: 6,
+    MAX_LENGTH: 128,
+    PATTERN: REGEX_PATTERNS.PASSWORD,
+    REQUIRED: true
+  },
   
-  // ∑π¿Ãæ∆øÙ
-  CONTAINER: 'container',
-  ROW: 'row',
-  COLUMN: 'col',
-  SIDEBAR: 'sidebar',
-  NAVBAR: 'navbar',
-  CONTENT: 'content'
-};
-
-// ===== æ∆¿Ãƒ‹ ¿Ã∏ß (Material Icons) =====
-const ICONS = {
-  // ±‚∫ª
-  ADD: 'add',
-  EDIT: 'edit',
-  DELETE: 'delete',
-  SAVE: 'save',
-  CANCEL: 'cancel',
-  SEARCH: 'search',
-  FILTER: 'filter_list',
-  SORT: 'sort',
-  REFRESH: 'refresh',
+  EMAIL: {
+    MAX_LENGTH: 255,
+    PATTERN: REGEX_PATTERNS.EMAIL,
+    REQUIRED: false
+  },
   
-  // ≥◊∫Ò∞‘¿Ãº«
-  HOME: 'home',
-  BACK: 'arrow_back',
-  FORWARD: 'arrow_forward',
-  UP: 'keyboard_arrow_up',
-  DOWN: 'keyboard_arrow_down',
+  BOSS_NAME: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 50,
+    REQUIRED: true
+  },
   
-  // ªÁøÎ¿⁄
-  PERSON: 'person',
-  PEOPLE: 'people',
-  ACCOUNT: 'account_circle',
-  LOGIN: 'login',
-  LOGOUT: 'logout',
-  
-  // ªÛ≈¬
-  CHECK: 'check',
-  CLOSE: 'close',
-  WARNING: 'warning',
-  ERROR: 'error',
-  INFO: 'info',
-  SUCCESS: 'check_circle',
-  
-  // ±‚¥…
-  SETTINGS: 'settings',
-  HELP: 'help',
-  NOTIFICATION: 'notifications',
-  EMAIL: 'email',
-  PHONE: 'phone',
-  
-  // ∞‘¿” ∞¸∑√
-  GAME: 'sports_esports',
-  TROPHY: 'emoji_events',
-  SHIELD: 'shield',
-  SWORD: 'casino',
-  
-  // ±›¿∂
-  MONEY: 'attach_money',
-  WALLET: 'account_balance_wallet',
-  CHART: 'bar_chart',
-  TREND: 'trending_up'
+  AMOUNT: {
+    MIN: 0,
+    MAX: Number.MAX_SAFE_INTEGER,
+    REQUIRED: true
+  }
 };
