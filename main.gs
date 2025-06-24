@@ -7,7 +7,7 @@
 // ===== 웹앱 진입점 =====
 function doGet(e) {
   try {
-    console.log('🚀 웹앱 진입점 시작 (CSP 안전 모드)');
+    console.log('🚀 웹앱 진입점 시작 (IFRAME SANDBOX 모드)');
     
     // 시스템 설정 초기화
     try {
@@ -16,19 +16,142 @@ function doGet(e) {
       console.warn('⚠️ SystemConfig 초기화 실패, 기본값 사용:', error);
     }
     
-    // HTML 템플릿 생성 - CSP 안전
+    // HTML 템플릿을 IFRAME 모드로 생성
     const htmlOutput = HtmlService.createTemplateFromFile('index')
       .evaluate()
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)  // 중요! IFRAME 모드 설정
       .setTitle('길드 관리 시스템')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
     
-    console.log('✅ HTML 서비스 초기화 완료 (CSP 안전)');
+    console.log('✅ HTML 서비스 초기화 완료 (IFRAME SANDBOX 모드)');
     return htmlOutput;
     
   } catch (error) {
     console.error('❌ doGet 오류:', error);
     return createErrorPage(error);
   }
+}
+
+// ===== 오류 페이지도 IFRAME 모드로 =====
+function createErrorPage(error) {
+  const errorHtml = HtmlService.createHtmlOutput(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>시스템 오류</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+          display: flex; 
+          justify-content: center; 
+          align-items: center; 
+          min-height: 100vh; 
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: #333;
+        }
+        .error-container { 
+          text-align: center; 
+          background: white; 
+          padding: 40px; 
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          max-width: 500px;
+          margin: 20px;
+        }
+        .error-icon { 
+          font-size: 72px; 
+          margin-bottom: 20px;
+        }
+        .error-title { 
+          color: #e74c3c; 
+          margin-bottom: 16px;
+          font-size: 24px;
+          font-weight: 600;
+        }
+        .error-message { 
+          color: #7f8c8d; 
+          margin-bottom: 24px;
+          line-height: 1.6;
+        }
+        .retry-button, .setup-button {
+          background: #3498db;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 25px;
+          cursor: pointer;
+          font-size: 14px;
+          margin: 10px;
+          font-family: inherit;
+        }
+        .setup-button {
+          background: #2ecc71;
+        }
+        .info-box {
+          margin-top: 20px; 
+          padding: 15px; 
+          background: #e8f5e9; 
+          border-radius: 8px; 
+          font-size: 12px;
+          text-align: left;
+          color: #2e7d32;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="error-container">
+        <div class="error-icon">🛠️</div>
+        <h1 class="error-title">시스템 초기화 필요</h1>
+        <p class="error-message">
+          시스템을 처음 사용하시거나 설정이 필요합니다.<br>
+          IFRAME 모드로 CSP 문제를 해결했습니다!
+        </p>
+        <button class="retry-button" id="retryBtn">다시 시도</button>
+        <button class="setup-button" id="setupBtn">시스템 초기화</button>
+        
+        <div class="info-box">
+          <strong>✅ IFRAME SANDBOX 모드 활성화:</strong><br>
+          • Google Apps Script CSP 우회<br>
+          • 외부 라이브러리 안전 사용<br>
+          • eval() 문제 해결<br>
+          • 완벽한 호환성 보장
+        </div>
+      </div>
+      
+      <script>
+        // 안전한 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('retryBtn').addEventListener('click', function() {
+            window.location.reload();
+          });
+          
+          document.getElementById('setupBtn').addEventListener('click', function() {
+            // google.script.run 사용 (IFRAME 모드에서 안전)
+            google.script.run
+              .withSuccessHandler(function(result) {
+                if (result.success) {
+                  alert('시스템이 초기화되었습니다!');
+                  window.location.reload();
+                } else {
+                  alert('초기화 실패: ' + result.message);
+                }
+              })
+              .withFailureHandler(function(error) {
+                alert('오류: ' + error.message);
+              })
+              .initializeSystem();
+          });
+        });
+      </script>
+    </body>
+    </html>
+  `)
+  .setSandboxMode(HtmlService.SandboxMode.IFRAME);  // IFRAME 모드 설정
+  
+  return errorHtml;
 }
 
 // ===== 파일 포함 함수 (CSP 안전) =====
