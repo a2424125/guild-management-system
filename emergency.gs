@@ -1735,3 +1735,148 @@ function resetAdminAccount() {
     console.log('❌ 계정 재생성 실패:', error.message);
   }
 }
+// emergency.gs 파일에 추가하세요
+
+function testWebAppFunctions() {
+  console.log('🌐 웹앱 함수 테스트 시작...');
+  
+  try {
+    // 1. doGet 함수 테스트
+    console.log('📥 1. doGet 함수 테스트:');
+    console.log('  - doGet 함수 존재:', typeof doGet === 'function' ? '✅ 있음' : '❌ 없음');
+    
+    if (typeof doGet === 'function') {
+      try {
+        const mockEvent = { parameter: {} };
+        const result = doGet(mockEvent);
+        console.log('  - doGet 실행:', '✅ 성공');
+        console.log('  - 반환 타입:', typeof result);
+        
+        if (result && typeof result.getContent === 'function') {
+          const content = result.getContent();
+          console.log('  - HTML 길이:', content.length, '글자');
+          console.log('  - HTML 시작 부분:', content.substring(0, 100) + '...');
+        }
+      } catch (e) {
+        console.log('  - doGet 실행: ❌ 실패 -', e.message);
+      }
+    }
+    
+    // 2. doPost 함수 테스트  
+    console.log('📤 2. doPost 함수 테스트:');
+    console.log('  - doPost 함수 존재:', typeof doPost === 'function' ? '✅ 있음' : '❌ 없음');
+    
+    if (typeof doPost === 'function') {
+      try {
+        const mockEvent = {
+          parameter: {
+            action: 'login',
+            nickname: 'admin',
+            password: 'Admin#2025!Safe'
+          }
+        };
+        const result = doPost(mockEvent);
+        console.log('  - doPost 실행:', '✅ 성공');
+        
+        if (result && typeof result.getContent === 'function') {
+          const content = result.getContent();
+          console.log('  - 응답 길이:', content.length, '글자');
+          console.log('  - 응답 시작:', content.substring(0, 100) + '...');
+        }
+      } catch (e) {
+        console.log('  - doPost 실행: ❌ 실패 -', e.message);
+      }
+    }
+    
+    // 3. HtmlService 테스트
+    console.log('🎨 3. HtmlService 테스트:');
+    try {
+      const testHtml = HtmlService.createHtmlOutput('<h1>테스트</h1>');
+      console.log('  - HtmlService:', '✅ 정상 작동');
+    } catch (e) {
+      console.log('  - HtmlService: ❌ 오류 -', e.message);
+    }
+    
+    // 4. 현재 웹앱 배포 정보
+    console.log('🚀 4. 배포 정보:');
+    try {
+      const url = ScriptApp.getService().getUrl();
+      console.log('  - 현재 웹앱 URL:', url || '❌ 배포되지 않음');
+    } catch (e) {
+      console.log('  - 배포 상태: ❌ 확인 불가');
+    }
+    
+  } catch (error) {
+    console.log('❌ 테스트 중 오류:', error.message);
+  }
+}
+
+// 단순한 HTML 테스트
+function testSimpleHTML() {
+  console.log('🧪 단순 HTML 테스트...');
+  
+  try {
+    const simpleHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>테스트</title>
+</head>
+<body>
+    <h1>🎉 테스트 성공!</h1>
+    <p>백엔드가 정상 작동합니다!</p>
+    <div style="background: green; color: white; padding: 20px; margin: 20px;">
+        시스템이 완전히 정상입니다!
+    </div>
+</body>
+</html>`;
+    
+    const htmlOutput = HtmlService.createHtmlOutput(simpleHtml);
+    console.log('✅ HTML 생성 성공');
+    console.log('💡 이 HTML을 doGet에서 반환하면 웹앱이 작동할 것입니다');
+    
+    return htmlOutput;
+    
+  } catch (error) {
+    console.log('❌ HTML 테스트 실패:', error.message);
+    return null;
+  }
+}
+
+// 웹앱 URL 직접 확인
+function checkDeployment() {
+  console.log('🔍 배포 상태 확인...');
+  
+  try {
+    const service = ScriptApp.getService();
+    
+    // 현재 활성 배포 확인
+    if (service) {
+      const url = service.getUrl();
+      console.log('📍 현재 웹앱 URL:', url);
+      
+      if (url) {
+        console.log('✅ 웹앱이 배포되어 있습니다');
+        console.log('💡 이 URL로 접속해보세요:', url);
+        
+        // URL 복사를 위한 표시
+        console.log('');
+        console.log('🔗 복사할 URL:');
+        console.log(url);
+        console.log('');
+        
+      } else {
+        console.log('❌ 웹앱이 배포되지 않았습니다');
+        console.log('💡 배포 → 새 배포를 해야 합니다');
+      }
+    }
+    
+    // 권한 확인
+    console.log('🔐 권한 확인:');
+    const user = Session.getActiveUser();
+    console.log('  - 현재 사용자:', user.getEmail());
+    
+  } catch (error) {
+    console.log('❌ 배포 확인 실패:', error.message);
+  }
+}
