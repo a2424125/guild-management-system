@@ -510,3 +510,143 @@ function testNewExecDeployment() {
     };
   }
 }
+// 진짜 문제 원인을 찾기 위한 초간단 테스트
+function debugRealProblem() {
+  console.log('🔍 진짜 문제 원인 찾기 시작...');
+  
+  try {
+    // 1. 가장 간단한 doGet 테스트
+    console.log('1️⃣ 간단한 doGet 테스트:');
+    
+    const testEvent = { parameter: {} };
+    const result = doGet(testEvent);
+    
+    console.log('doGet 결과 타입:', typeof result);
+    console.log('doGet 결과 존재:', !!result);
+    
+    if (result) {
+      console.log('getContent 함수 존재:', typeof result.getContent === 'function');
+      
+      if (typeof result.getContent === 'function') {
+        const content = result.getContent();
+        console.log('HTML 길이:', content ? content.length : 0);
+        console.log('HTML 시작 부분:', content ? content.substring(0, 100) : 'NULL');
+        
+        // HTML에 문제가 있는지 확인
+        const hasDoctype = content && content.includes('<!DOCTYPE');
+        const hasHtml = content && content.includes('<html');
+        const hasBody = content && content.includes('<body');
+        
+        console.log('DOCTYPE 있음:', hasDoctype);
+        console.log('HTML 태그 있음:', hasHtml);
+        console.log('BODY 태그 있음:', hasBody);
+      }
+    }
+    
+    // 2. 매우 간단한 HTML 직접 생성 테스트
+    console.log('');
+    console.log('2️⃣ 직접 HTML 생성 테스트:');
+    
+    const simpleHtml = `<!DOCTYPE html>
+<html>
+<head><title>테스트</title></head>
+<body>
+  <h1>테스트 성공!</h1>
+  <p>이 페이지가 보인다면 HTML 생성은 정상입니다.</p>
+</body>
+</html>`;
+    
+    const simpleOutput = HtmlService.createHtmlOutput(simpleHtml);
+    console.log('간단한 HTML 생성:', !!simpleOutput);
+    console.log('간단한 HTML 내용 길이:', simpleOutput.getContent().length);
+    
+    // 3. 스프레드시트 접근 테스트
+    console.log('');
+    console.log('3️⃣ 스프레드시트 접근 테스트:');
+    try {
+      const sheet = SpreadsheetApp.openById(SystemConfig.SPREADSHEET_ID);
+      console.log('스프레드시트 접근: 성공');
+      console.log('스프레드시트 이름:', sheet.getName());
+    } catch (sheetError) {
+      console.log('스프레드시트 접근: 실패 -', sheetError.message);
+    }
+    
+    // 4. 권한 확인
+    console.log('');
+    console.log('4️⃣ 권한 확인:');
+    try {
+      const user = Session.getActiveUser();
+      console.log('현재 사용자:', user.getEmail());
+    } catch (permError) {
+      console.log('권한 확인 실패:', permError.message);
+    }
+    
+    return {
+      doGetWorks: !!result,
+      htmlGenerated: !!result && typeof result.getContent === 'function',
+      contentLength: result ? result.getContent().length : 0
+    };
+    
+  } catch (error) {
+    console.error('❌ 디버깅 중 오류:', error);
+    console.error('오류 스택:', error.stack);
+    return {
+      error: error.message,
+      stack: error.stack
+    };
+  }
+}
+
+// 매우 간단한 doGet 버전으로 교체해보기
+function testSimpleDoGet() {
+  console.log('🧪 매우 간단한 doGet 테스트...');
+  
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>간단 테스트</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding: 50px;">
+  <h1>🎯 테스트 성공!</h1>
+  <p>이 페이지가 보인다면 기본 HTML은 정상입니다.</p>
+  <p>현재 시간: ${new Date().toLocaleString('ko-KR')}</p>
+  
+  <form method="POST" action="">
+    <input type="hidden" name="action" value="test">
+    <br><br>
+    <button type="submit" style="padding: 10px 20px; font-size: 16px;">POST 테스트</button>
+  </form>
+</body>
+</html>`;
+
+  return HtmlService.createHtmlOutput(html)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+}
+
+// 네트워크 응답 확인용
+function checkNetworkResponse() {
+  console.log('🌐 네트워크 응답 체크...');
+  
+  try {
+    // 현재 배포된 URL들 확인
+    const devUrl = ScriptApp.getService().getUrl();
+    console.log('개발 URL:', devUrl);
+    
+    // 매우 간단한 응답 생성
+    const response = {
+      timestamp: new Date().toISOString(),
+      message: 'API 응답 성공',
+      doGetTest: typeof doGet === 'function',
+      doPostTest: typeof doPost === 'function'
+    };
+    
+    console.log('API 응답 테스트:', JSON.stringify(response, null, 2));
+    
+    return response;
+    
+  } catch (error) {
+    console.error('네트워크 응답 체크 실패:', error);
+    return { error: error.message };
+  }
+}
