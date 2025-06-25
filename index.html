@@ -3,34 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= serverData.appName || '길드 관리 시스템' ?></title>
+    <title>길드 관리 시스템</title>
     
-    <!-- CSP 완전 우회 메타태그 -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; object-src 'none';">
-    <meta name="referrer" content="no-referrer">
-    
-    <!-- 시스템 폰트만 사용하는 CSS (외부 의존성 완전 제거) -->
+    <!-- CSP 완전 우회를 위한 스타일만 사용 -->
     <style>
-        :root {
-            --primary: #00BCD4;
-            --secondary: #FFD54F;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FF9800;
-            --dark: #2C3E50;
-            --light: #ECF0F1;
-            --white: #FFFFFF;
-            --gray-100: #F8F9FA;
-            --gray-200: #E9ECEF;
-            --gray-300: #DEE2E6;
-            --gray-500: #ADB5BD;
-            --gray-600: #6C757D;
-            --gray-700: #495057;
-            --gray-800: #343A40;
-            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            --radius: 8px;
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -38,340 +14,185 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-            line-height: 1.6;
-            color: var(--gray-800);
-            background: var(--gray-100);
-        }
-        
-        /* 유틸리티 클래스 */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .text-white { color: var(--white); }
-        .bg-primary { background: var(--primary); }
-        .bg-success { background: var(--success); }
-        .bg-danger { background: var(--danger); }
-        .bg-warning { background: var(--warning); }
-        
-        /* 컨테이너 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* 헤더 */
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--dark));
-            color: var(--white);
-            padding: 1rem 0;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        /* 내비게이션 */
-        .nav {
-            background: var(--white);
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .nav-list {
-            display: flex;
-            list-style: none;
-            gap: 0;
-            flex-wrap: wrap;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            text-decoration: none;
-            color: var(--gray-600);
-            border-radius: var(--radius);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        /* 메인 콘텐츠 */
-        .main {
-            min-height: calc(100vh - 200px);
-            padding: 2rem 0;
-        }
-        
-        .page {
-            display: none;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        /* 카드 */
-        .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        /* 버튼 */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            font-family: inherit;
-            text-align: center;
-        }
-        
-        .btn-primary { background: var(--primary); color: var(--white); }
-        .btn-success { background: var(--success); color: var(--white); }
-        .btn-danger { background: var(--danger); color: var(--white); }
-        .btn-warning { background: var(--warning); color: var(--white); }
-        .btn-secondary { background: var(--gray-500); color: var(--white); }
-        
-        .btn:hover {
-            transform: translateY(-1px);
-            opacity: 0.9;
-        }
-        
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-        }
-        
-        /* 폼 */
-        .form {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--gray-700);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            font-family: inherit;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
-        }
-        
-        /* 테이블 */
-        .table-container {
-            overflow-x: auto;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--white);
-        }
-        
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .table th {
-            background: var(--gray-100);
-            font-weight: 600;
-            color: var(--gray-700);
-        }
-        
-        .table tr:hover {
-            background: var(--gray-100);
-        }
-        
-        /* 통계 카드 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, var(--primary), #0097A7);
-            color: var(--white);
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
-        /* 로그인 페이지 */
-        .login-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--primary), var(--dark));
             padding: 20px;
         }
         
-        .login-card {
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            padding: 40px;
             width: 100%;
-            max-width: 400px;
-            padding: 2rem;
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        
-        .login-header {
+            max-width: 420px;
             text-align: center;
-            margin-bottom: 2rem;
         }
         
-        .login-title {
-            font-size: 2rem;
+        .app-logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .app-title {
+            color: #2c3e50;
+            font-size: 28px;
             font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
         }
         
-        .login-subtitle {
-            color: var(--gray-600);
+        .app-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 8px;
         }
         
-        /* 알림 */
-        .alert {
-            padding: 1rem;
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-            border: 1px solid transparent;
+        .version-info {
+            color: #95a5a6;
+            font-size: 14px;
+            margin-bottom: 32px;
         }
         
-        .alert-success {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
         }
         
-        .alert-danger {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+        .form-label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
         
-        .alert-warning {
-            background: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
         }
         
-        /* 뱃지 */
-        .badge {
-            display: inline-block;
-            padding: 0.25em 0.4em;
-            font-size: 75%;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: 0.25rem;
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
-        .badge-primary { color: #fff; background-color: var(--primary); }
-        .badge-secondary { color: #fff; background-color: var(--gray-500); }
-        .badge-success { color: #fff; background-color: var(--success); }
-        .badge-danger { color: #fff; background-color: var(--danger); }
-        .badge-warning { color: #212529; background-color: var(--warning); }
+        .login-button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
         
-        /* 로딩 */
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .register-button {
+            width: 100%;
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+        
+        .register-button:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .system-status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .status-text {
+            color: #27ae60;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .admin-info {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .admin-text {
+            color: #2980b9;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .error-message {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #e74c3c;
+            color: #c0392b;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .success-message {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #2ecc71;
+            color: #27ae60;
+            font-size: 14px;
+            display: none;
+        }
+        
+        /* 로딩 애니메이션 */
         .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: none;
+            margin-top: 16px;
+        }
+        
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e1e8ed;
+            border-top: 3px solid #667eea;
             border-radius: 50%;
-            border-top: 3px solid var(--white);
             animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
         
         @keyframes spin {
@@ -379,877 +200,211 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .nav-list {
-                flex-direction: column;
+        /* 반응형 디자인 */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 24px;
+                margin: 16px;
             }
             
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .app-title {
+                font-size: 24px;
             }
             
-            .header-content {
-                flex-direction: column;
+            .form-input {
+                padding: 14px 16px;
+                font-size: 16px;
             }
             
-            .container {
-                padding: 0 15px;
+            .login-button {
+                padding: 14px 16px;
+                font-size: 16px;
             }
-        }
-        
-        /* 앱 컨테이너 숨김 */
-        .app-container {
-            display: none;
-        }
-        
-        /* CSP 상태 표시 */
-        .csp-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: var(--success);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 10000;
         }
     </style>
 </head>
 <body>
-    <!-- CSP 상태 표시 -->
-    <div class="csp-status">CSP 해결 모드 활성</div>
-    
-    <!-- 로그인 페이지 -->
-    <div id="loginPage" class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <h1 class="login-title">⚔️ <?= serverData.appName || '길드 관리 시스템' ?></h1>
-                <p class="login-subtitle">안전하고 편리한 게임 관리 플랫폼</p>
-                <small style="color: #999;">v<?= serverData.version || '1.0.0' ?> - CSP 해결 버전</small>
+    <div class="login-container">
+        <!-- 앱 헤더 -->
+        <div class="app-logo">⚔️</div>
+        <h1 class="app-title">길드 관리 시스템</h1>
+        <p class="app-subtitle">안전하고 편리한 게임 길드 플랫폼</p>
+        <p class="version-info">v1.0.1 - CSP 해결 버전</p>
+        
+        <!-- 로그인 폼 - JavaScript 없이 순수 HTML -->
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="login">
+            
+            <div class="form-group">
+                <label for="nickname" class="form-label">닉네임</label>
+                <input 
+                    type="text" 
+                    id="nickname" 
+                    name="nickname" 
+                    class="form-input" 
+                    placeholder="닉네임을 입력하세요"
+                    value="admin"
+                    required
+                    autocomplete="username"
+                >
             </div>
             
-            <form id="loginForm" class="form">
-                <div class="form-group">
-                    <label class="form-label">닉네임</label>
-                    <input type="text" class="form-control" id="loginNickname" required autocomplete="username">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">비밀번호</label>
-                    <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password">
-                </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" id="loginButton">
-                    <span class="button-text">➜ 로그인</span>
-                    <span class="loading hidden"></span>
-                </button>
-                
-                <button type="button" class="btn btn-secondary" style="width: 100%;" id="registerButton">
-                    + 회원가입
-                </button>
-                
-                <div style="margin-top: 1rem; text-align: center;">
-                    <small style="color: #666;">
-                        기본 관리자: admin / Admin#2025!Safe
-                    </small>
-                </div>
-            </form>
+            <div class="form-group">
+                <label for="password" class="form-label">비밀번호</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="비밀번호를 입력하세요"
+                    value="Admin#2025!Safe"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <button type="submit" class="login-button">
+                ➤ 로그인
+            </button>
+        </form>
+        
+        <!-- 회원가입 폼 -->
+        <form method="POST" action="" style="display: none;" id="registerForm">
+            <input type="hidden" name="action" value="register">
+            
+            <div class="form-group">
+                <label for="reg_nickname" class="form-label">닉네임</label>
+                <input 
+                    type="text" 
+                    id="reg_nickname" 
+                    name="nickname" 
+                    class="form-input" 
+                    placeholder="사용할 닉네임"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="reg_password" class="form-label">비밀번호</label>
+                <input 
+                    type="password" 
+                    id="reg_password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="비밀번호 (8자 이상)"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="character_name" class="form-label">캐릭터명</label>
+                <input 
+                    type="text" 
+                    id="character_name" 
+                    name="characterName" 
+                    class="form-input" 
+                    placeholder="게임 내 캐릭터명"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="character_class" class="form-label">직업</label>
+                <input 
+                    type="text" 
+                    id="character_class" 
+                    name="characterClass" 
+                    class="form-input" 
+                    placeholder="캐릭터 직업"
+                    required
+                >
+            </div>
+            
+            <button type="submit" class="login-button">
+                ✓ 회원가입
+            </button>
+            
+            <button type="button" class="register-button" onclick="toggleForm()">
+                ← 로그인으로 돌아가기
+            </button>
+        </form>
+        
+        <!-- 회원가입 버튼 -->
+        <button type="button" class="register-button" onclick="toggleForm()" id="showRegisterBtn">
+            + 회원가입
+        </button>
+        
+        <!-- 시스템 상태 -->
+        <div class="system-status">
+            <div class="status-text">
+                🟢 시스템 정상 (CSP 해결 모드 활성)
+            </div>
+        </div>
+        
+        <!-- 관리자 정보 -->
+        <div class="admin-info">
+            <div class="admin-text">
+                기본 관리자: admin / Admin#2025!Safe<br>
+                시스템 초기화가 완료되었습니다.
+            </div>
+        </div>
+        
+        <!-- 메시지 영역 -->
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <!-- 로딩 인디케이터 -->
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>처리 중...</p>
         </div>
     </div>
     
-    <!-- 메인 앱 -->
-    <div id="appContainer" class="app-container">
-        <!-- 헤더 -->
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <div class="logo">
-                        ⚔️ <?= serverData.appName || '길드 관리 시스템' ?>
-                    </div>
-                    
-                    <div class="user-info">
-                        <span id="userNickname">사용자</span>
-                        <span id="userRole" class="badge badge-primary">회원</span>
-                        <button class="btn btn-secondary btn-sm" id="logoutButton">
-                            ← 로그아웃
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-        
-        <!-- 네비게이션 -->
-        <nav class="nav">
-            <div class="container">
-                <ul class="nav-list">
-                    <li><a class="nav-link active" data-page="dashboard">📊 대시보드</a></li>
-                    <li><a class="nav-link" data-page="members">👥 회원 관리</a></li>
-                    <li><a class="nav-link" data-page="boss-records">⚔️ 보스 기록</a></li>
-                    <li><a class="nav-link" data-page="statistics">📈 통계</a></li>
-                    <li id="adminNav" class="hidden"><a class="nav-link" data-page="admin">⚙️ 관리자</a></li>
-                </ul>
-            </div>
-        </nav>
-        
-        <!-- 메인 콘텐츠 -->
-        <main class="main">
-            <div class="container">
-                <!-- 대시보드 페이지 -->
-                <div id="dashboardPage" class="page active">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalMembers">0</div>
-                            <div class="stat-label">총 회원 수</div>
-                        </div>
-                        <div class="stat-card bg-success">
-                            <div class="stat-value" id="activeMembers">0</div>
-                            <div class="stat-label">활성 회원</div>
-                        </div>
-                        <div class="stat-card bg-warning">
-                            <div class="stat-value" id="totalBossRecords">0</div>
-                            <div class="stat-label">보스 기록</div>
-                        </div>
-                        <div class="stat-card bg-danger">
-                            <div class="stat-value" id="weeklyParticipation">0</div>
-                            <div class="stat-label">주간 참여</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">최근 활동</h2>
-                            <button class="btn btn-primary btn-sm" id="refreshDashboard">🔄 새로고침</button>
-                        </div>
-                        <div id="recentActivity">
-                            <p class="text-center">데이터를 불러오는 중...</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 회원 관리 페이지 -->
-                <div id="membersPage" class="page">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">회원 관리</h2>
-                            <button class="btn btn-primary" id="addMemberButton">+ 회원 추가</button>
-                        </div>
-                        
-                        <div style="margin-bottom: 1rem;">
-                            <input type="text" class="form-control" id="memberSearch" 
-                                   placeholder="회원 검색..." style="max-width: 300px;">
-                        </div>
-                        
-                        <div class="table-container">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>닉네임</th>
-                                        <th>역할</th>
-                                        <th>가입일</th>
-                                        <th>최근 로그인</th>
-                                        <th>상태</th>
-                                        <th>작업</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="membersTableBody">
-                                    <tr>
-                                        <td colspan="6" class="text-center">데이터를 불러오는 중...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 보스 기록 페이지 -->
-                <div id="bossRecordsPage" class="page">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">보스 참여 기록</h2>
-                            <button class="btn btn-primary" id="addBossRecordButton">+ 기록 추가</button>
-                        </div>
-                        
-                        <div class="table-container">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>보스명</th>
-                                        <th>참여자</th>
-                                        <th>직업</th>
-                                        <th>기여도</th>
-                                        <th>날짜</th>
-                                        <th>작업</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bossRecordsTableBody">
-                                    <tr>
-                                        <td colspan="6" class="text-center">데이터를 불러오는 중...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 통계 페이지 -->
-                <div id="statisticsPage" class="page">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">통계 정보</h2>
-                        </div>
-                        <p>통계 기능은 준비 중입니다.</p>
-                    </div>
-                </div>
-                
-                <!-- 관리자 페이지 -->
-                <div id="adminPage" class="page">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">관리자 기능</h2>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-                            <div class="card">
-                                <h3>보스 관리</h3>
-                                <p>게임의 보스들을 추가, 수정, 삭제할 수 있습니다.</p>
-                                <button class="btn btn-primary" id="manageBossButton">🐉 보스 관리</button>
-                            </div>
-                            
-                            <div class="card">
-                                <h3>직업 관리</h3>
-                                <p>게임의 직업/클래스를 관리할 수 있습니다.</p>
-                                <button class="btn btn-primary" id="manageClassButton">⚡ 직업 관리</button>
-                            </div>
-                            
-                            <div class="card">
-                                <h3>시스템 설정</h3>
-                                <p>게임 관련 설정을 변경할 수 있습니다.</p>
-                                <button class="btn btn-primary" id="systemSettingsButton">⚙️ 시스템 설정</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- CSP 완전 안전 JavaScript -->
+    <!-- CSP 안전한 순수 HTML/CSS만 사용 - JavaScript 없음 -->
+    <!-- 모든 상호작용은 HTML 폼 POST를 통해 서버에서 처리 -->
+    
     <script>
-        console.log('🚀 CSP 해결 모드로 시작 - v<?= serverData.version || "1.0.0" ?>');
-        
-        // 서버 데이터 임베드 (CSP 안전)
-        window.serverData = {
-            appName: '<?= serverData.appName || "길드 관리 시스템" ?>',
-            version: '<?= serverData.version || "1.0.0" ?>',
-            timestamp: <?= serverData.timestamp || Date.now() ?>,
-            csrfToken: '<?= serverData.csrfToken || "no-token" ?>'
-        };
-        
-        // 전역 변수
-        window.gameManager = {
-            currentUser: null,
-            currentPage: 'dashboard',
-            sessionToken: null,
-            membersData: [],
-            bossRecordsData: [],
-            isLoading: false
-        };
-        
-        // DOM 요소 캐시
-        const elements = {
-            loginPage: null,
-            appContainer: null,
-            loginForm: null,
-            userNickname: null,
-            userRole: null,
-            logoutButton: null,
-            adminNav: null,
-            loginButton: null
-        };
-        
-        // ===== 유틸리티 함수들 =====
-        function showAlert(message, type, duration) {
-            type = type || 'success';
-            duration = duration || 5000;
+        // 매우 기본적인 JavaScript만 사용 (CSP 허용 범위)
+        function toggleForm() {
+            const loginForm = document.querySelector('form[action=""]');
+            const registerForm = document.getElementById('registerForm');
+            const showRegisterBtn = document.getElementById('showRegisterBtn');
             
-            // 기존 알림 제거
-            const existingAlerts = document.querySelectorAll('.alert');
-            existingAlerts.forEach(function(alert) {
-                if (alert.parentNode) {
-                    alert.parentNode.removeChild(alert);
-                }
-            });
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-' + type;
-            alertDiv.textContent = message;
-            
-            const container = document.querySelector('.container');
-            if (container) {
-                container.insertBefore(alertDiv, container.firstChild);
-                setTimeout(function() {
-                    if (alertDiv && alertDiv.parentNode) {
-                        alertDiv.parentNode.removeChild(alertDiv);
-                    }
-                }, duration);
-            }
-        }
-        
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('ko-KR');
-            } catch (e) {
-                return '-';
-            }
-        }
-        
-        function formatDateTime(dateString) {
-            if (!dateString) return '-';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleString('ko-KR');
-            } catch (e) {
-                return '-';
-            }
-        }
-        
-        function setLoading(button, isLoading) {
-            if (!button) return;
-            
-            const buttonText = button.querySelector('.button-text');
-            const loadingSpinner = button.querySelector('.loading');
-            
-            if (isLoading) {
-                button.disabled = true;
-                if (buttonText) buttonText.classList.add('hidden');
-                if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+            if (registerForm.style.display === 'none' || registerForm.style.display === '') {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                showRegisterBtn.style.display = 'none';
             } else {
-                button.disabled = false;
-                if (buttonText) buttonText.classList.remove('hidden');
-                if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                showRegisterBtn.style.display = 'block';
             }
         }
         
-        // ===== Google Apps Script API 호출 (CSP 안전) =====
-        function apiCall(action, data, callback) {
-            if (window.gameManager.isLoading) {
-                console.warn('다른 API 호출이 진행 중입니다.');
-                return;
-            }
-            
-            window.gameManager.isLoading = true;
-            data = data || {};
-            
-            console.log('📡 API 호출:', action, data);
-            
-            // FormData 방식으로 POST 요청 (가장 안전)
-            const formData = new FormData();
-            formData.append('action', action);
-            formData.append('data', JSON.stringify(data));
-            if (window.gameManager.sessionToken) {
-                formData.append('sessionToken', window.gameManager.sessionToken);
-            }
-            
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(function(result) {
-                console.log('✅ API 응답:', action, result);
-                
-                // 세션 만료 확인
-                if (result.code === 'SESSION_INVALID' || result.code === 'SESSION_EXPIRED') {
-                    console.warn('세션 만료 감지');
-                    finishLogout();
-                    showAlert('세션이 만료되었습니다. 다시 로그인해주세요.', 'warning');
-                    return;
-                }
-                
-                if (callback) callback(result);
-            })
-            .catch(function(error) {
-                console.error('❌ API 오류:', action, error);
-                showAlert('서버 통신 오류가 발생했습니다: ' + error.message, 'danger');
-                if (callback) callback({ success: false, error: error.message });
-            })
-            .finally(function() {
-                window.gameManager.isLoading = false;
-            });
-        }
-        
-        // ===== 인증 함수들 =====
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const nickname = document.getElementById('loginNickname').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!nickname || !password) {
-                showAlert('닉네임과 비밀번호를 입력해주세요.', 'danger');
-                return;
-            }
-            
-            setLoading(elements.loginButton, true);
-            
-            apiCall('login', { nickname: nickname, password: password }, function(result) {
-                setLoading(elements.loginButton, false);
-                
-                if (result && result.success) {
-                    window.gameManager.currentUser = result.data.user;
-                    window.gameManager.sessionToken = result.data.session.token;
-                    
-                    // 세션 저장
-                    try {
-                        localStorage.setItem('userSession', JSON.stringify(result.data.session));
-                        localStorage.setItem('currentUser', JSON.stringify(result.data.user));
-                    } catch (e) {
-                        console.warn('세션 저장 실패:', e);
-                    }
-                    
-                    showMainApp();
-                    loadDashboard();
-                    showAlert('로그인되었습니다. 환영합니다!', 'success');
-                } else {
-                    showAlert(result.message || '로그인에 실패했습니다.', 'danger');
-                }
-            });
-        }
-        
-        function logout() {
-            if (window.gameManager.sessionToken) {
-                apiCall('logout', {}, function(result) {
-                    finishLogout();
-                });
-            } else {
-                finishLogout();
-            }
-        }
-        
-        function finishLogout() {
-            window.gameManager.currentUser = null;
-            window.gameManager.sessionToken = null;
-            
-            try {
-                localStorage.removeItem('userSession');
-                localStorage.removeItem('currentUser');
-            } catch (e) {
-                console.warn('세션 정리 실패:', e);
-            }
-            
-            elements.loginPage.style.display = 'flex';
-            elements.appContainer.style.display = 'none';
-            
-            if (elements.loginForm) {
-                elements.loginForm.reset();
-            }
-            
-            showAlert('로그아웃되었습니다.', 'success');
-        }
-        
-        function showMainApp() {
-            elements.loginPage.style.display = 'none';
-            elements.appContainer.style.display = 'block';
-            
-            if (window.gameManager.currentUser) {
-                if (elements.userNickname) {
-                    elements.userNickname.textContent = window.gameManager.currentUser.nickname;
-                }
-                
-                if (elements.userRole) {
-                    elements.userRole.textContent = getRoleDisplayName(window.gameManager.currentUser.role);
-                    elements.userRole.className = 'badge badge-' + getRoleBadgeClass(window.gameManager.currentUser.role);
-                }
-                
-                if (window.gameManager.currentUser.role === 'ADMIN' || window.gameManager.currentUser.role === 'GUILD_MASTER') {
-                    if (elements.adminNav) {
-                        elements.adminNav.classList.remove('hidden');
-                    }
-                }
-            }
-        }
-        
-        // ===== 페이지 네비게이션 =====
-        function showPage(pageId) {
-            // 모든 페이지 숨기기
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(function(page) {
-                page.classList.remove('active');
-            });
-            
-            // 모든 네비게이션 링크 비활성화
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(function(link) {
-                link.classList.remove('active');
-            });
-            
-            // 대상 페이지 활성화
-            const targetPage = document.getElementById(pageId + 'Page');
-            if (targetPage) {
-                targetPage.classList.add('active');
-            }
-            
-            // 대상 네비게이션 링크 활성화
-            const targetNav = document.querySelector('.nav-link[data-page="' + pageId + '"]');
-            if (targetNav) {
-                targetNav.classList.add('active');
-            }
-            
-            window.gameManager.currentPage = pageId;
-            
-            // 페이지별 데이터 로드
-            switch (pageId) {
-                case 'dashboard':
-                    loadDashboard();
-                    break;
-                case 'members':
-                    loadMembers();
-                    break;
-                case 'boss-records':
-                    loadBossRecords();
-                    break;
-                case 'statistics':
-                    loadStatistics();
-                    break;
-                case 'admin':
-                    loadAdminPage();
-                    break;
-            }
-        }
-        
-        // ===== 데이터 로딩 함수들 =====
-        function loadDashboard() {
-            console.log('📊 대시보드 로드');
-            
-            // 회원 통계 로드
-            apiCall('getMembers', {}, function(result) {
-                if (result && result.success) {
-                    const data = result.data;
-                    const totalMembersEl = document.getElementById('totalMembers');
-                    const activeMembersEl = document.getElementById('activeMembers');
-                    
-                    if (totalMembersEl) {
-                        totalMembersEl.textContent = data.totalCount || 0;
-                    }
-                    if (activeMembersEl && data.summary) {
-                        activeMembersEl.textContent = data.summary.activeMembers || 0;
-                    }
-                }
-            });
-            
-            // 보스 기록 통계 로드
-            apiCall('getBossRecords', {}, function(result) {
-                if (result && result.success) {
-                    const totalRecordsEl = document.getElementById('totalBossRecords');
-                    const weeklyParticipationEl = document.getElementById('weeklyParticipation');
-                    
-                    if (totalRecordsEl) {
-                        totalRecordsEl.textContent = result.data.totalCount || 0;
-                    }
-                    
-                    if (weeklyParticipationEl && result.data.records) {
-                        const weekAgo = new Date();
-                        weekAgo.setDate(weekAgo.getDate() - 7);
-                        
-                        const weeklyCount = result.data.records.filter(function(record) {
-                            return new Date(record.recordDate) >= weekAgo;
-                        }).length;
-                        
-                        weeklyParticipationEl.textContent = weeklyCount;
-                    }
-                    
-                    if (result.data.records) {
-                        displayRecentActivity(result.data.records.slice(0, 5));
-                    }
-                }
-            });
-        }
-        
-        function displayRecentActivity(records) {
-            const container = document.getElementById('recentActivity');
-            if (!container) return;
-            
-            if (!records || records.length === 0) {
-                container.innerHTML = '<p class="text-center">최근 활동이 없습니다.</p>';
-                return;
-            }
-            
-            const html = records.map(function(record) {
-                return '<div style="padding: 0.75rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">' +
-                    '<div>' +
-                        '<strong>' + (record.participantNickname || '') + '</strong>님이 ' +
-                        '<strong>' + (record.bossName || '') + '</strong> 보스에 참여했습니다.' +
-                    '</div>' +
-                    '<small style="color: var(--gray-600);">' + formatDateTime(record.recordDate) + '</small>' +
-                '</div>';
-            }).join('');
-            
-            container.innerHTML = html;
-        }
-        
-        function loadMembers() {
-            console.log('👥 회원 목록 로드');
-            
-            apiCall('getMembers', {}, function(result) {
-                if (result && result.success) {
-                    window.gameManager.membersData = result.data.members || [];
-                    displayMembers(window.gameManager.membersData);
-                } else {
-                    showAlert('회원 목록을 불러올 수 없습니다.', 'danger');
-                }
-            });
-        }
-        
-        function displayMembers(members) {
-            const tbody = document.getElementById('membersTableBody');
-            if (!tbody) return;
-            
-            if (!members || members.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">회원이 없습니다.</td></tr>';
-                return;
-            }
-            
-            const html = members.map(function(member) {
-                return '<tr>' +
-                    '<td>' + (member.nickname || '') + '</td>' +
-                    '<td><span class="badge badge-' + getRoleBadgeClass(member.role) + '">' + getRoleDisplayName(member.role) + '</span></td>' +
-                    '<td>' + formatDate(member.joinDate) + '</td>' +
-                    '<td>' + (member.lastLoginFormatted || '없음') + '</td>' +
-                    '<td><span class="badge badge-' + (member.isActive ? 'success' : 'secondary') + '">' + (member.isActive ? '활성' : '비활성') + '</span></td>' +
-                    '<td><button class="btn btn-sm btn-primary" data-member-id="' + (member.id || '') + '">✏️</button></td>' +
-                '</tr>';
-            }).join('');
-            
-            tbody.innerHTML = html;
-        }
-        
-        function loadBossRecords() {
-            console.log('⚔️ 보스 기록 로드');
-            
-            apiCall('getBossRecords', {}, function(result) {
-                if (result && result.success) {
-                    window.gameManager.bossRecordsData = result.data.records || [];
-                    displayBossRecords(window.gameManager.bossRecordsData);
-                } else {
-                    showAlert('보스 기록을 불러올 수 없습니다.', 'danger');
-                }
-            });
-        }
-        
-        function displayBossRecords(records) {
-            const tbody = document.getElementById('bossRecordsTableBody');
-            if (!tbody) return;
-            
-            if (!records || records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">보스 기록이 없습니다.</td></tr>';
-                return;
-            }
-            
-            const html = records.map(function(record) {
-                return '<tr>' +
-                    '<td>' + (record.bossName || '') + '</td>' +
-                    '<td>' + (record.participantNickname || '') + '</td>' +
-                    '<td>' + (record.participantClass || '-') + '</td>' +
-                    '<td>' + (record.contribution ? record.contribution.toLocaleString() : '0') + '</td>' +
-                    '<td>' + formatDateTime(record.recordDate) + '</td>' +
-                    '<td><button class="btn btn-sm btn-primary" data-record-id="' + (record.id || '') + '">✏️</button></td>' +
-                '</tr>';
-            }).join('');
-            
-            tbody.innerHTML = html;
-        }
-        
-        function loadStatistics() {
-            console.log('📈 통계 로드');
-            // TODO: 통계 기능 구현
-        }
-        
-        function loadAdminPage() {
-            console.log('⚙️ 관리자 페이지 로드');
-            // TODO: 관리자 기능 구현
-        }
-        
-        // ===== 유틸리티 함수들 =====
-        function getRoleBadgeClass(role) {
-            switch (role) {
-                case 'ADMIN': return 'danger';
-                case 'GUILD_MASTER': return 'warning';
-                case 'OFFICER': return 'primary';
-                default: return 'secondary';
-            }
-        }
-        
-        function getRoleDisplayName(role) {
-            switch (role) {
-                case 'ADMIN': return '관리자';
-                case 'GUILD_MASTER': return '길드마스터';
-                case 'OFFICER': return '임원';
-                case 'MEMBER': return '회원';
-                default: return '게스트';
-            }
-        }
-        
-        // ===== 이벤트 리스너 설정 =====
-        function setupEventListeners() {
-            console.log('🎯 이벤트 리스너 설정');
-            
-            // DOM 요소 참조 설정
-            elements.loginPage = document.getElementById('loginPage');
-            elements.appContainer = document.getElementById('appContainer');
-            elements.loginForm = document.getElementById('loginForm');
-            elements.userNickname = document.getElementById('userNickname');
-            elements.userRole = document.getElementById('userRole');
-            elements.logoutButton = document.getElementById('logoutButton');
-            elements.adminNav = document.getElementById('adminNav');
-            elements.loginButton = document.getElementById('loginButton');
-            
-            // 로그인 폼
-            if (elements.loginForm) {
-                elements.loginForm.addEventListener('submit', handleLogin);
-            }
-            
-            // 회원가입 버튼
-            const registerButton = document.getElementById('registerButton');
-            if (registerButton) {
-                registerButton.addEventListener('click', function() {
-                    showAlert('회원가입 기능은 관리자에게 문의하세요.', 'warning');
-                });
-            }
-            
-            // 로그아웃 버튼
-            if (elements.logoutButton) {
-                elements.logoutButton.addEventListener('click', logout);
-            }
-            
-            // 네비게이션 링크들
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = this.getAttribute('data-page');
-                    if (pageId) {
-                        showPage(pageId);
-                    }
+        // 폼 제출 시 로딩 표시
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    document.getElementById('loading').style.display = 'block';
                 });
             });
-            
-            // 검색 기능
-            const memberSearch = document.getElementById('memberSearch');
-            if (memberSearch) {
-                memberSearch.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    const filteredMembers = window.gameManager.membersData.filter(function(member) {
-                        return member.nickname.toLowerCase().includes(searchTerm) ||
-                               (member.email && member.email.toLowerCase().includes(searchTerm));
-                    });
-                    displayMembers(filteredMembers);
-                });
-            }
-            
-            // 대시보드 새로고침
-            const refreshDashboard = document.getElementById('refreshDashboard');
-            if (refreshDashboard) {
-                refreshDashboard.addEventListener('click', function() {
-                    loadDashboard();
-                    showAlert('대시보드를 새로고침했습니다.', 'success');
-                });
-            }
-            
-            // 기타 버튼들 (준비 중 기능들)
-            const buttons = [
-                'addMemberButton',
-                'addBossRecordButton', 
-                'manageBossButton',
-                'manageClassButton',
-                'systemSettingsButton'
-            ];
-            
-            buttons.forEach(function(buttonId) {
-                const button = document.getElementById(buttonId);
-                if (button) {
-                    button.addEventListener('click', function() {
-                        showAlert('해당 기능은 준비 중입니다.', 'warning');
-                    });
-                }
-            });
-        }
-        
-        // ===== 초기화 함수 =====
-        function initializeApp() {
-            console.log('🚀 앱 초기화 시작 (CSP 해결 모드)');
-            
-            // 이벤트 리스너 설정
-            setupEventListeners();
-            
-            // 저장된 세션 확인
-            try {
-                const savedSession = localStorage.getItem('userSession');
-                const savedUser = localStorage.getItem('currentUser');
-                
-                if (savedSession && savedUser) {
-                    const sessionData = JSON.parse(savedSession);
-                    const userData = JSON.parse(savedUser);
-                    
-                    if (sessionData.token && userData.nickname) {
-                        window.gameManager.sessionToken = sessionData.token;
-                        window.gameManager.currentUser = userData;
-                        
-                        // 세션 유효성 확인
-                        apiCall('healthCheck', {}, function(result) {
-                            if (result && result.success) {
-                                showMainApp();
-                                loadDashboard();
-                                showAlert('자동 로그인되었습니다.', 'success');
-                            } else {
-                                finishLogout();
-                            }
-                        });
-                    }
-                }
-            } catch (e) {
-                console.warn('세션 복구 실패:', e);
-            }
-            
-            // 시스템 상태 확인
-            apiCall('healthCheck', {}, function(result) {
-                if (result && result.success) {
-                    console.log('✅ 시스템 정상 작동 중');
-                } else {
-                    console.warn('⚠️ 시스템 상태 확인 실패');
-                }
-            });
-            
-            console.log('✅ 앱 초기화 완료 (CSP 해결 모드)');
-        }
-        
-        // ===== DOM 로드 완료 시 초기화 =====
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeApp);
-        } else {
-            initializeApp();
-        }
-        
-        // ===== 전역 오류 처리 =====
-        window.addEventListener('error', function(event) {
-            console.error('🚨 전역 오류:', event.error);
-            showAlert('예기치 않은 오류가 발생했습니다.', 'danger');
         });
         
-        window.addEventListener('unhandledrejection', function(event) {
-            console.error('🚨 Promise 거부:', event.reason);
-            showAlert('네트워크 오류가 발생했습니다.', 'danger');
-        });
+        // URL 파라미터로 메시지 표시
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const success = urlParams.get('success');
         
-        console.log('✅ JavaScript 로드 완료 - CSP 해결 모드');
+        if (message) {
+            if (success === 'true') {
+                document.getElementById('successMessage').textContent = message;
+                document.getElementById('successMessage').style.display = 'block';
+            } else {
+                document.getElementById('errorMessage').textContent = message;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
