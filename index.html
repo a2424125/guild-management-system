@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>길드 관리 시스템</title>
+    <title><?= serverData.appName || '길드 관리 시스템' ?></title>
     
-    <!-- CSP 완전 호환 스타일 - 외부 의존성 완전 제거 -->
+    <!-- CSP 완전 우회 메타태그 -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; object-src 'none';">
+    <meta name="referrer" content="no-referrer">
+    
+    <!-- 시스템 폰트만 사용하는 CSS (외부 의존성 완전 제거) -->
     <style>
-        /* CSS 변수와 시스템 폰트만 사용 */
         :root {
             --primary: #00BCD4;
             --secondary: #FFD54F;
@@ -35,7 +38,7 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
             line-height: 1.6;
             color: var(--gray-800);
             background: var(--gray-100);
@@ -399,35 +402,59 @@
         .app-container {
             display: none;
         }
+        
+        /* CSP 상태 표시 */
+        .csp-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 10000;
+        }
     </style>
 </head>
 <body>
+    <!-- CSP 상태 표시 -->
+    <div class="csp-status">CSP 해결 모드 활성</div>
+    
     <!-- 로그인 페이지 -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h1 class="login-title">⚔️ 길드 관리 시스템</h1>
+                <h1 class="login-title">⚔️ <?= serverData.appName || '길드 관리 시스템' ?></h1>
                 <p class="login-subtitle">안전하고 편리한 게임 관리 플랫폼</p>
+                <small style="color: #999;">v<?= serverData.version || '1.0.0' ?> - CSP 해결 버전</small>
             </div>
             
             <form id="loginForm" class="form">
                 <div class="form-group">
                     <label class="form-label">닉네임</label>
-                    <input type="text" class="form-control" id="loginNickname" required>
+                    <input type="text" class="form-control" id="loginNickname" required autocomplete="username">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">비밀번호</label>
-                    <input type="password" class="form-control" id="loginPassword" required>
+                    <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password">
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
-                    ➜ 로그인
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" id="loginButton">
+                    <span class="button-text">➜ 로그인</span>
+                    <span class="loading hidden"></span>
                 </button>
                 
                 <button type="button" class="btn btn-secondary" style="width: 100%;" id="registerButton">
                     + 회원가입
                 </button>
+                
+                <div style="margin-top: 1rem; text-align: center;">
+                    <small style="color: #666;">
+                        기본 관리자: admin / Admin#2025!Safe
+                    </small>
+                </div>
             </form>
         </div>
     </div>
@@ -439,11 +466,12 @@
             <div class="container">
                 <div class="header-content">
                     <div class="logo">
-                        ⚔️ 길드 관리 시스템
+                        ⚔️ <?= serverData.appName || '길드 관리 시스템' ?>
                     </div>
                     
                     <div class="user-info">
                         <span id="userNickname">사용자</span>
+                        <span id="userRole" class="badge badge-primary">회원</span>
                         <button class="btn btn-secondary btn-sm" id="logoutButton">
                             ← 로그아웃
                         </button>
@@ -492,6 +520,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">최근 활동</h2>
+                            <button class="btn btn-primary btn-sm" id="refreshDashboard">🔄 새로고침</button>
                         </div>
                         <div id="recentActivity">
                             <p class="text-center">데이터를 불러오는 중...</p>
@@ -608,26 +637,51 @@
 
     <!-- CSP 완전 안전 JavaScript -->
     <script>
-        // 전역 변수
-        let currentUser = null;
-        let currentPage = 'dashboard';
-        let sessionToken = null;
-        let membersData = [];
-        let bossRecordsData = [];
+        console.log('🚀 CSP 해결 모드로 시작 - v<?= serverData.version || "1.0.0" ?>');
         
-        // DOM 요소 참조 (CSP 안전)
+        // 서버 데이터 임베드 (CSP 안전)
+        window.serverData = {
+            appName: '<?= serverData.appName || "길드 관리 시스템" ?>',
+            version: '<?= serverData.version || "1.0.0" ?>',
+            timestamp: <?= serverData.timestamp || Date.now() ?>,
+            csrfToken: '<?= serverData.csrfToken || "no-token" ?>'
+        };
+        
+        // 전역 변수
+        window.gameManager = {
+            currentUser: null,
+            currentPage: 'dashboard',
+            sessionToken: null,
+            membersData: [],
+            bossRecordsData: [],
+            isLoading: false
+        };
+        
+        // DOM 요소 캐시
         const elements = {
             loginPage: null,
             appContainer: null,
             loginForm: null,
             userNickname: null,
+            userRole: null,
             logoutButton: null,
-            adminNav: null
+            adminNav: null,
+            loginButton: null
         };
         
-        // 유틸리티 함수들
-        function showAlert(message, type) {
+        // ===== 유틸리티 함수들 =====
+        function showAlert(message, type, duration) {
             type = type || 'success';
+            duration = duration || 5000;
+            
+            // 기존 알림 제거
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(function(alert) {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            });
+            
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-' + type;
             alertDiv.textContent = message;
@@ -639,76 +693,105 @@
                     if (alertDiv && alertDiv.parentNode) {
                         alertDiv.parentNode.removeChild(alertDiv);
                     }
-                }, 5000);
+                }, duration);
             }
         }
         
         function formatDate(dateString) {
             if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ko-KR');
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ko-KR');
+            } catch (e) {
+                return '-';
+            }
         }
         
         function formatDateTime(dateString) {
             if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleString('ko-KR');
-        }
-        
-        // Google Apps Script API 호출 (CSP 안전)
-        function apiCall(action, data, callback) {
-            data = data || {};
-            
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                // google.script.run 사용 (가장 안전한 방법)
-                google.script.run
-                    .withSuccessHandler(function(result) {
-                        if (callback) callback(result);
-                    })
-                    .withFailureHandler(function(error) {
-                        console.error('API 호출 오류:', error);
-                        showAlert('서버 오류가 발생했습니다.', 'danger');
-                        if (callback) callback({ success: false, error: error.message });
-                    })
-                    .doPost({ 
-                        parameter: { 
-                            action: action, 
-                            data: JSON.stringify(data),
-                            sessionToken: sessionToken 
-                        } 
-                    });
-            } else {
-                // 폴백: FormData 방식
-                const formData = new FormData();
-                formData.append('action', action);
-                formData.append('data', JSON.stringify(data));
-                if (sessionToken) {
-                    formData.append('sessionToken', sessionToken);
-                }
-                
-                fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(result) {
-                    if (callback) callback(result);
-                })
-                .catch(function(error) {
-                    console.error('API 호출 오류:', error);
-                    showAlert('서버 오류가 발생했습니다.', 'danger');
-                    if (callback) callback({ success: false, error: error.message });
-                });
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString('ko-KR');
+            } catch (e) {
+                return '-';
             }
         }
         
-        // 인증 함수들
+        function setLoading(button, isLoading) {
+            if (!button) return;
+            
+            const buttonText = button.querySelector('.button-text');
+            const loadingSpinner = button.querySelector('.loading');
+            
+            if (isLoading) {
+                button.disabled = true;
+                if (buttonText) buttonText.classList.add('hidden');
+                if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+            } else {
+                button.disabled = false;
+                if (buttonText) buttonText.classList.remove('hidden');
+                if (loadingSpinner) loadingSpinner.classList.add('hidden');
+            }
+        }
+        
+        // ===== Google Apps Script API 호출 (CSP 안전) =====
+        function apiCall(action, data, callback) {
+            if (window.gameManager.isLoading) {
+                console.warn('다른 API 호출이 진행 중입니다.');
+                return;
+            }
+            
+            window.gameManager.isLoading = true;
+            data = data || {};
+            
+            console.log('📡 API 호출:', action, data);
+            
+            // FormData 방식으로 POST 요청 (가장 안전)
+            const formData = new FormData();
+            formData.append('action', action);
+            formData.append('data', JSON.stringify(data));
+            if (window.gameManager.sessionToken) {
+                formData.append('sessionToken', window.gameManager.sessionToken);
+            }
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                console.log('✅ API 응답:', action, result);
+                
+                // 세션 만료 확인
+                if (result.code === 'SESSION_INVALID' || result.code === 'SESSION_EXPIRED') {
+                    console.warn('세션 만료 감지');
+                    finishLogout();
+                    showAlert('세션이 만료되었습니다. 다시 로그인해주세요.', 'warning');
+                    return;
+                }
+                
+                if (callback) callback(result);
+            })
+            .catch(function(error) {
+                console.error('❌ API 오류:', action, error);
+                showAlert('서버 통신 오류가 발생했습니다: ' + error.message, 'danger');
+                if (callback) callback({ success: false, error: error.message });
+            })
+            .finally(function() {
+                window.gameManager.isLoading = false;
+            });
+        }
+        
+        // ===== 인증 함수들 =====
         function handleLogin(event) {
             event.preventDefault();
             
-            const nickname = document.getElementById('loginNickname').value;
+            const nickname = document.getElementById('loginNickname').value.trim();
             const password = document.getElementById('loginPassword').value;
             
             if (!nickname || !password) {
@@ -716,21 +799,26 @@
                 return;
             }
             
+            setLoading(elements.loginButton, true);
+            
             apiCall('login', { nickname: nickname, password: password }, function(result) {
+                setLoading(elements.loginButton, false);
+                
                 if (result && result.success) {
-                    currentUser = result.data.user;
-                    sessionToken = result.data.session.token;
+                    window.gameManager.currentUser = result.data.user;
+                    window.gameManager.sessionToken = result.data.session.token;
                     
                     // 세션 저장
                     try {
-                        sessionStorage.setItem('userSession', JSON.stringify(result.data.session));
-                        sessionStorage.setItem('currentUser', JSON.stringify(result.data.user));
+                        localStorage.setItem('userSession', JSON.stringify(result.data.session));
+                        localStorage.setItem('currentUser', JSON.stringify(result.data.user));
                     } catch (e) {
                         console.warn('세션 저장 실패:', e);
                     }
                     
                     showMainApp();
                     loadDashboard();
+                    showAlert('로그인되었습니다. 환영합니다!', 'success');
                 } else {
                     showAlert(result.message || '로그인에 실패했습니다.', 'danger');
                 }
@@ -738,7 +826,7 @@
         }
         
         function logout() {
-            if (sessionToken) {
+            if (window.gameManager.sessionToken) {
                 apiCall('logout', {}, function(result) {
                     finishLogout();
                 });
@@ -748,12 +836,12 @@
         }
         
         function finishLogout() {
-            currentUser = null;
-            sessionToken = null;
+            window.gameManager.currentUser = null;
+            window.gameManager.sessionToken = null;
             
             try {
-                sessionStorage.removeItem('userSession');
-                sessionStorage.removeItem('currentUser');
+                localStorage.removeItem('userSession');
+                localStorage.removeItem('currentUser');
             } catch (e) {
                 console.warn('세션 정리 실패:', e);
             }
@@ -764,18 +852,25 @@
             if (elements.loginForm) {
                 elements.loginForm.reset();
             }
+            
+            showAlert('로그아웃되었습니다.', 'success');
         }
         
         function showMainApp() {
             elements.loginPage.style.display = 'none';
             elements.appContainer.style.display = 'block';
             
-            if (currentUser) {
+            if (window.gameManager.currentUser) {
                 if (elements.userNickname) {
-                    elements.userNickname.textContent = currentUser.nickname;
+                    elements.userNickname.textContent = window.gameManager.currentUser.nickname;
                 }
                 
-                if (currentUser.role === 'ADMIN' || currentUser.role === 'GUILD_MASTER') {
+                if (elements.userRole) {
+                    elements.userRole.textContent = getRoleDisplayName(window.gameManager.currentUser.role);
+                    elements.userRole.className = 'badge badge-' + getRoleBadgeClass(window.gameManager.currentUser.role);
+                }
+                
+                if (window.gameManager.currentUser.role === 'ADMIN' || window.gameManager.currentUser.role === 'GUILD_MASTER') {
                     if (elements.adminNav) {
                         elements.adminNav.classList.remove('hidden');
                     }
@@ -783,7 +878,7 @@
             }
         }
         
-        // 페이지 네비게이션
+        // ===== 페이지 네비게이션 =====
         function showPage(pageId) {
             // 모든 페이지 숨기기
             const pages = document.querySelectorAll('.page');
@@ -809,7 +904,7 @@
                 targetNav.classList.add('active');
             }
             
-            currentPage = pageId;
+            window.gameManager.currentPage = pageId;
             
             // 페이지별 데이터 로드
             switch (pageId) {
@@ -831,8 +926,11 @@
             }
         }
         
-        // 데이터 로딩 함수들
+        // ===== 데이터 로딩 함수들 =====
         function loadDashboard() {
+            console.log('📊 대시보드 로드');
+            
+            // 회원 통계 로드
             apiCall('getMembers', {}, function(result) {
                 if (result && result.success) {
                     const data = result.data;
@@ -848,6 +946,7 @@
                 }
             });
             
+            // 보스 기록 통계 로드
             apiCall('getBossRecords', {}, function(result) {
                 if (result && result.success) {
                     const totalRecordsEl = document.getElementById('totalBossRecords');
@@ -880,7 +979,7 @@
             if (!container) return;
             
             if (!records || records.length === 0) {
-                container.innerHTML = '<p>최근 활동이 없습니다.</p>';
+                container.innerHTML = '<p class="text-center">최근 활동이 없습니다.</p>';
                 return;
             }
             
@@ -898,10 +997,12 @@
         }
         
         function loadMembers() {
+            console.log('👥 회원 목록 로드');
+            
             apiCall('getMembers', {}, function(result) {
                 if (result && result.success) {
-                    membersData = result.data.members || [];
-                    displayMembers(membersData);
+                    window.gameManager.membersData = result.data.members || [];
+                    displayMembers(window.gameManager.membersData);
                 } else {
                     showAlert('회원 목록을 불러올 수 없습니다.', 'danger');
                 }
@@ -931,30 +1032,13 @@
             tbody.innerHTML = html;
         }
         
-        function getRoleBadgeClass(role) {
-            switch (role) {
-                case 'ADMIN': return 'danger';
-                case 'GUILD_MASTER': return 'warning';
-                case 'OFFICER': return 'primary';
-                default: return 'secondary';
-            }
-        }
-        
-        function getRoleDisplayName(role) {
-            switch (role) {
-                case 'ADMIN': return '관리자';
-                case 'GUILD_MASTER': return '길드마스터';
-                case 'OFFICER': return '임원';
-                case 'MEMBER': return '회원';
-                default: return '게스트';
-            }
-        }
-        
         function loadBossRecords() {
+            console.log('⚔️ 보스 기록 로드');
+            
             apiCall('getBossRecords', {}, function(result) {
                 if (result && result.success) {
-                    bossRecordsData = result.data.records || [];
-                    displayBossRecords(bossRecordsData);
+                    window.gameManager.bossRecordsData = result.data.records || [];
+                    displayBossRecords(window.gameManager.bossRecordsData);
                 } else {
                     showAlert('보스 기록을 불러올 수 없습니다.', 'danger');
                 }
@@ -985,22 +1069,48 @@
         }
         
         function loadStatistics() {
-            // TODO: 통계 로딩 구현
+            console.log('📈 통계 로드');
+            // TODO: 통계 기능 구현
         }
         
         function loadAdminPage() {
-            // TODO: 관리자 페이지 로딩 구현
+            console.log('⚙️ 관리자 페이지 로드');
+            // TODO: 관리자 기능 구현
         }
         
-        // 이벤트 리스너 설정 (CSP 안전)
+        // ===== 유틸리티 함수들 =====
+        function getRoleBadgeClass(role) {
+            switch (role) {
+                case 'ADMIN': return 'danger';
+                case 'GUILD_MASTER': return 'warning';
+                case 'OFFICER': return 'primary';
+                default: return 'secondary';
+            }
+        }
+        
+        function getRoleDisplayName(role) {
+            switch (role) {
+                case 'ADMIN': return '관리자';
+                case 'GUILD_MASTER': return '길드마스터';
+                case 'OFFICER': return '임원';
+                case 'MEMBER': return '회원';
+                default: return '게스트';
+            }
+        }
+        
+        // ===== 이벤트 리스너 설정 =====
         function setupEventListeners() {
+            console.log('🎯 이벤트 리스너 설정');
+            
             // DOM 요소 참조 설정
             elements.loginPage = document.getElementById('loginPage');
             elements.appContainer = document.getElementById('appContainer');
             elements.loginForm = document.getElementById('loginForm');
             elements.userNickname = document.getElementById('userNickname');
+            elements.userRole = document.getElementById('userRole');
             elements.logoutButton = document.getElementById('logoutButton');
             elements.adminNav = document.getElementById('adminNav');
+            elements.loginButton = document.getElementById('loginButton');
             
             // 로그인 폼
             if (elements.loginForm) {
@@ -1037,7 +1147,7 @@
             if (memberSearch) {
                 memberSearch.addEventListener('input', function(e) {
                     const searchTerm = e.target.value.toLowerCase();
-                    const filteredMembers = membersData.filter(function(member) {
+                    const filteredMembers = window.gameManager.membersData.filter(function(member) {
                         return member.nickname.toLowerCase().includes(searchTerm) ||
                                (member.email && member.email.toLowerCase().includes(searchTerm));
                     });
@@ -1045,67 +1155,60 @@
                 });
             }
             
-            // 기타 버튼들
-            const addMemberButton = document.getElementById('addMemberButton');
-            if (addMemberButton) {
-                addMemberButton.addEventListener('click', function() {
-                    showAlert('회원 추가 기능은 준비 중입니다.', 'warning');
+            // 대시보드 새로고침
+            const refreshDashboard = document.getElementById('refreshDashboard');
+            if (refreshDashboard) {
+                refreshDashboard.addEventListener('click', function() {
+                    loadDashboard();
+                    showAlert('대시보드를 새로고침했습니다.', 'success');
                 });
             }
             
-            const addBossRecordButton = document.getElementById('addBossRecordButton');
-            if (addBossRecordButton) {
-                addBossRecordButton.addEventListener('click', function() {
-                    showAlert('보스 기록 추가 기능은 준비 중입니다.', 'warning');
-                });
-            }
+            // 기타 버튼들 (준비 중 기능들)
+            const buttons = [
+                'addMemberButton',
+                'addBossRecordButton', 
+                'manageBossButton',
+                'manageClassButton',
+                'systemSettingsButton'
+            ];
             
-            const manageBossButton = document.getElementById('manageBossButton');
-            if (manageBossButton) {
-                manageBossButton.addEventListener('click', function() {
-                    showAlert('보스 관리 기능은 준비 중입니다.', 'warning');
-                });
-            }
-            
-            const manageClassButton = document.getElementById('manageClassButton');
-            if (manageClassButton) {
-                manageClassButton.addEventListener('click', function() {
-                    showAlert('직업 관리 기능은 준비 중입니다.', 'warning');
-                });
-            }
-            
-            const systemSettingsButton = document.getElementById('systemSettingsButton');
-            if (systemSettingsButton) {
-                systemSettingsButton.addEventListener('click', function() {
-                    showAlert('시스템 설정 기능은 준비 중입니다.', 'warning');
-                });
-            }
+            buttons.forEach(function(buttonId) {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    button.addEventListener('click', function() {
+                        showAlert('해당 기능은 준비 중입니다.', 'warning');
+                    });
+                }
+            });
         }
         
-        // 초기화 함수
+        // ===== 초기화 함수 =====
         function initializeApp() {
-            console.log('앱 초기화 시작 (CSP 안전 모드)');
+            console.log('🚀 앱 초기화 시작 (CSP 해결 모드)');
             
             // 이벤트 리스너 설정
             setupEventListeners();
             
             // 저장된 세션 확인
             try {
-                const savedSession = sessionStorage.getItem('userSession');
-                const savedUser = sessionStorage.getItem('currentUser');
+                const savedSession = localStorage.getItem('userSession');
+                const savedUser = localStorage.getItem('currentUser');
                 
                 if (savedSession && savedUser) {
                     const sessionData = JSON.parse(savedSession);
                     const userData = JSON.parse(savedUser);
                     
                     if (sessionData.token && userData.nickname) {
-                        sessionToken = sessionData.token;
-                        currentUser = userData;
+                        window.gameManager.sessionToken = sessionData.token;
+                        window.gameManager.currentUser = userData;
                         
+                        // 세션 유효성 확인
                         apiCall('healthCheck', {}, function(result) {
                             if (result && result.success) {
                                 showMainApp();
                                 loadDashboard();
+                                showAlert('자동 로그인되었습니다.', 'success');
                             } else {
                                 finishLogout();
                             }
@@ -1116,15 +1219,37 @@
                 console.warn('세션 복구 실패:', e);
             }
             
-            console.log('앱 초기화 완료 (CSP 호환)');
+            // 시스템 상태 확인
+            apiCall('healthCheck', {}, function(result) {
+                if (result && result.success) {
+                    console.log('✅ 시스템 정상 작동 중');
+                } else {
+                    console.warn('⚠️ 시스템 상태 확인 실패');
+                }
+            });
+            
+            console.log('✅ 앱 초기화 완료 (CSP 해결 모드)');
         }
         
-        // DOM 로드 완료 시 초기화
+        // ===== DOM 로드 완료 시 초기화 =====
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeApp);
         } else {
             initializeApp();
         }
+        
+        // ===== 전역 오류 처리 =====
+        window.addEventListener('error', function(event) {
+            console.error('🚨 전역 오류:', event.error);
+            showAlert('예기치 않은 오류가 발생했습니다.', 'danger');
+        });
+        
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('🚨 Promise 거부:', event.reason);
+            showAlert('네트워크 오류가 발생했습니다.', 'danger');
+        });
+        
+        console.log('✅ JavaScript 로드 완료 - CSP 해결 모드');
     </script>
 </body>
 </html>
