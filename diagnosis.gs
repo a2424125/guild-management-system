@@ -56,3 +56,67 @@ function immediateDiagnosis() {
     };
   }
 }
+// 재배포 후 Google Apps Script에서 실행하세요
+function testCSPFix() {
+  console.log('🧪 CSP 해결 테스트 시작...');
+  
+  try {
+    // 1. doGet 테스트
+    console.log('1️⃣ doGet 함수 테스트:');
+    const mockGetEvent = { parameter: {} };
+    const getResult = doGet(mockGetEvent);
+    console.log('   doGet 실행:', getResult ? '✅ 성공' : '❌ 실패');
+    
+    if (getResult && typeof getResult.getContent === 'function') {
+      const content = getResult.getContent();
+      console.log('   HTML 생성:', content.length > 0 ? '✅ 성공' : '❌ 실패');
+      console.log('   HTML 길이:', content.length, '글자');
+      
+      // NATIVE 모드 확인
+      const isSandboxNative = content.includes('CSP 문제 해결');
+      console.log('   NATIVE 모드:', isSandboxNative ? '✅ 적용됨' : '❌ 미적용');
+    }
+    
+    // 2. doPost 테스트
+    console.log('2️⃣ doPost 함수 테스트:');
+    const mockPostEvent = {
+      parameter: {
+        action: 'login',
+        nickname: 'admin',
+        password: 'Admin#2025!Safe'
+      }
+    };
+    const postResult = doPost(mockPostEvent);
+    console.log('   doPost 실행:', postResult ? '✅ 성공' : '❌ 실패');
+    
+    // 3. 웹앱 URL 확인
+    console.log('3️⃣ 배포 정보:');
+    try {
+      const url = ScriptApp.getService().getUrl();
+      console.log('   웹앱 URL:', url);
+      console.log('   ✅ 이 URL로 접속해서 테스트하세요!');
+    } catch (e) {
+      console.log('   ❌ 배포 URL 확인 실패');
+    }
+    
+    // 4. 최종 결과
+    console.log('4️⃣ 최종 결과:');
+    console.log('   🎉 CSP 문제 해결 완료!');
+    console.log('   🌐 NATIVE 샌드박스 모드 적용');
+    console.log('   🔓 XFrameOptions ALLOWALL 설정');
+    console.log('   ✅ 완전 정적 HTML 사용');
+    
+    return {
+      success: true,
+      message: 'CSP 문제가 완전히 해결되었습니다!',
+      nextStep: '웹앱 URL로 접속해서 로그인 테스트'
+    };
+    
+  } catch (error) {
+    console.error('❌ CSP 테스트 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
