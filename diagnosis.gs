@@ -261,3 +261,109 @@ function finalVerification() {
     };
   }
 }
+function checkNewDeployment() {
+  console.log('🔍 새 배포 확인 시작...');
+  
+  try {
+    // 현재 웹앱 URL 가져오기
+    const currentURL = ScriptApp.getService().getUrl();
+    console.log('📍 현재 URL:', currentURL);
+    
+    // URL 타입 분석
+    let urlStatus = 'UNKNOWN';
+    let deploymentType = 'UNKNOWN';
+    
+    if (currentURL) {
+      if (currentURL.includes('/dev')) {
+        urlStatus = 'DEVELOPMENT';
+        deploymentType = '개발 모드';
+        console.log('⚠️ 여전히 개발 모드입니다.');
+        console.log('💡 새 배포를 다시 시도하세요.');
+      } else if (currentURL.includes('/exec')) {
+        urlStatus = 'PRODUCTION';
+        deploymentType = '실제 배포';
+        console.log('✅ 실제 배포 성공!');
+      }
+    }
+    
+    console.log('🔍 배포 상태:', deploymentType);
+    console.log('');
+    
+    if (urlStatus === 'PRODUCTION') {
+      // 실제 배포 성공 - 모든 테스트 실행
+      console.log('🎉 실제 배포 성공! 전체 테스트 실행...');
+      
+      // 1. doGet 테스트
+      console.log('1️⃣ doGet 테스트:');
+      const getResult = doGet({ parameter: {} });
+      const getSuccess = getResult && typeof getResult.getContent === 'function';
+      console.log('   doGet 함수:', getSuccess ? '✅ 정상' : '❌ 오류');
+      
+      // 2. doPost 테스트  
+      console.log('2️⃣ doPost 테스트:');
+      const postResult = doPost({
+        parameter: {
+          action: 'login',
+          nickname: 'admin', 
+          password: 'Admin#2025!Safe'
+        }
+      });
+      const postSuccess = postResult && typeof postResult.getContent === 'function';
+      console.log('   doPost 함수:', postSuccess ? '✅ 정상' : '❌ 오류');
+      
+      if (getSuccess && postSuccess) {
+        console.log('');
+        console.log('🎊 🎊 🎊 프로젝트 완성! 🎊 🎊 🎊');
+        console.log('');
+        console.log('🔗 최종 웹앱 URL:');
+        console.log(currentURL);
+        console.log('');
+        console.log('✅ 할 일:');
+        console.log('1. 위 URL로 접속');
+        console.log('2. admin / Admin#2025!Safe 로 로그인');
+        console.log('3. 성공 페이지 확인');
+        console.log('4. 팀원들에게 URL 공유');
+        console.log('');
+        console.log('🎯 일주일간의 고생이 드디어 끝났습니다!');
+        
+        return {
+          success: true,
+          status: 'COMPLETED',
+          webAppURL: currentURL,
+          message: '프로젝트 완성! 즉시 사용 가능!'
+        };
+      }
+    } else if (urlStatus === 'DEVELOPMENT') {
+      console.log('❌ 여전히 개발 모드입니다.');
+      console.log('');
+      console.log('🔧 해결 방법:');
+      console.log('1. Google Apps Script에서 "배포" 클릭');
+      console.log('2. "새 배포" 선택');
+      console.log('3. 톱니바퀴 → "웹앱" 선택');
+      console.log('4. "배포" 버튼 클릭');
+      console.log('5. 새 URL이 /exec로 끝나는지 확인');
+      
+      return {
+        success: false,
+        status: 'STILL_DEVELOPMENT',
+        currentURL: currentURL,
+        message: '새 실제 배포 생성 필요'
+      };
+    }
+    
+    return {
+      success: false,
+      status: 'UNKNOWN_ERROR',
+      currentURL: currentURL,
+      message: '알 수 없는 문제'
+    };
+    
+  } catch (error) {
+    console.error('❌ 새 배포 확인 실패:', error);
+    return {
+      success: false,
+      status: 'ERROR',
+      error: error.message
+    };
+  }
+}
