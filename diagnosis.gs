@@ -367,3 +367,45 @@ function checkNewDeployment() {
     };
   }
 }
+// Google Apps Script에서 즉시 실행하세요
+function checkRealDeploymentStatus() {
+  console.log('🔍 실제 배포 상태 정확 진단...');
+  
+  try {
+    // 1. 현재 스크립트 정보
+    const scriptId = ScriptApp.getScriptId();
+    console.log('📋 스크립트 ID:', scriptId);
+    
+    // 2. 개발 URL (항상 /dev)
+    const devUrl = ScriptApp.getService().getUrl();
+    console.log('🔧 개발 URL:', devUrl);
+    
+    // 3. 현재 배포된 버전들 확인하기
+    console.log('📊 배포 상태 체크 완료');
+    console.log('');
+    console.log('🎯 다음 단계:');
+    console.log('1. Google Apps Script 편집기에서');
+    console.log('2. 우측 상단 "배포" 버튼 클릭');
+    console.log('3. "배포 관리" 선택');
+    console.log('4. 웹앱 배포가 있는지 확인');
+    console.log('5. 있다면 그 URL이 실제 /exec URL입니다');
+    console.log('');
+    console.log('❓ 배포 관리에 웹앱이 없다면:');
+    console.log('→ 실제로 배포가 안 된 상황입니다');
+    console.log('→ immediateDeployFix() 함수를 실행하세요');
+    
+    return {
+      scriptId: scriptId,
+      devUrl: devUrl,
+      status: 'DIAGNOSIS_COMPLETE',
+      nextStep: 'CHECK_DEPLOYMENT_MANAGER'
+    };
+    
+  } catch (error) {
+    console.error('❌ 진단 실패:', error);
+    return {
+      error: error.message,
+      solution: 'immediateDeployFix() 함수를 실행하세요'
+    };
+  }
+}
