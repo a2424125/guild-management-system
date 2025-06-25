@@ -1529,3 +1529,30 @@ function finalCSPStatusCheck() {
     };
   }
 }
+// Google Apps Script에서 즉시 실행해서 확인
+function quickDiagnosis() {
+  console.log('=== 빠른 진단 시작 ===');
+  
+  // 1. 서비스 로드 상태
+  console.log('SystemConfig:', typeof SystemConfig);
+  console.log('AuthService:', typeof AuthService);
+  console.log('DatabaseUtils:', typeof DatabaseUtils);
+  
+  // 2. 스프레드시트 연결
+  try {
+    const sheet = SpreadsheetApp.openById(SystemConfig.SPREADSHEET_ID);
+    console.log('✅ 스프레드시트 연결 성공:', sheet.getName());
+  } catch (e) {
+    console.log('❌ 스프레드시트 연결 실패:', e.message);
+  }
+  
+  // 3. 관리자 계정
+  try {
+    const admin = DatabaseUtils.findUserByNickname('admin');
+    console.log('관리자 계정:', admin ? '존재' : '없음');
+  } catch (e) {
+    console.log('관리자 계정 확인 실패:', e.message);
+  }
+  
+  console.log('=== 진단 완료 ===');
+}
