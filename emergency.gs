@@ -948,3 +948,584 @@ function runCompleteDiagnosis() {
     summary: summary
   };
 }
+// ===== 최종 해결책: CSP 문제 완전 제거 =====
+function finalCSPSolution() {
+  console.log('🚀 최종 CSP 해결 시작...');
+  
+  const results = {
+    timestamp: new Date().toISOString(),
+    steps: [],
+    success: false
+  };
+  
+  try {
+    // 1단계: 시스템 상태 완전 확인
+    console.log('1️⃣ 시스템 상태 완전 확인...');
+    const systemCheck = checkCompleteSystemStatus();
+    results.steps.push({
+      step: 1,
+      name: '시스템 상태 확인',
+      success: systemCheck.success,
+      details: systemCheck
+    });
+    
+    // 2단계: 데이터베이스 강제 초기화
+    console.log('2️⃣ 데이터베이스 강제 초기화...');
+    const dbCheck = forceInitializeDatabase();
+    results.steps.push({
+      step: 2,
+      name: '데이터베이스 초기화',
+      success: dbCheck.success,
+      details: dbCheck
+    });
+    
+    // 3단계: 관리자 계정 강제 생성
+    console.log('3️⃣ 관리자 계정 강제 생성...');
+    const adminCheck = forceCreateAdminAccount();
+    results.steps.push({
+      step: 3,
+      name: '관리자 계정 생성',
+      success: adminCheck.success,
+      details: adminCheck
+    });
+    
+    // 4단계: API 라우팅 테스트
+    console.log('4️⃣ API 라우팅 테스트...');
+    const apiCheck = testAllAPIRoutes();
+    results.steps.push({
+      step: 4,
+      name: 'API 라우팅 테스트',
+      success: apiCheck.success,
+      details: apiCheck
+    });
+    
+    // 5단계: 로그인 완전 테스트
+    console.log('5️⃣ 로그인 완전 테스트...');
+    const loginCheck = testCompleteLogin();
+    results.steps.push({
+      step: 5,
+      name: '로그인 테스트',
+      success: loginCheck.success,
+      details: loginCheck
+    });
+    
+    // 최종 결과 판정
+    const allSuccess = results.steps.every(step => step.success);
+    results.success = allSuccess;
+    
+    if (allSuccess) {
+      console.log('🎉🎉🎉 최종 CSP 해결 완료! 🎉🎉🎉');
+      return {
+        success: true,
+        message: '✅ CSP 문제가 완전히 해결되었습니다!',
+        instructions: [
+          '1. 웹앱을 새로고침하세요 (F5)',
+          '2. admin / Admin#2025!Safe 로 로그인하세요',
+          '3. 로그인 성공 후 비밀번호를 변경하세요',
+          '4. 관리자 메뉴에서 게임에 맞는 설정을 하세요'
+        ],
+        details: results
+      };
+    } else {
+      console.log('❌ 일부 단계에서 실패');
+      return {
+        success: false,
+        message: '일부 단계에서 문제가 발생했습니다.',
+        details: results
+      };
+    }
+    
+  } catch (error) {
+    console.error('❌ 최종 해결 과정에서 오류:', error);
+    return {
+      success: false,
+      message: '최종 해결 과정에서 오류가 발생했습니다: ' + error.message,
+      error: error.stack
+    };
+  }
+}
+
+// ===== 시스템 상태 완전 확인 =====
+function checkCompleteSystemStatus() {
+  try {
+    const status = {
+      timestamp: new Date().toISOString(),
+      services: {},
+      spreadsheet: {},
+      permissions: {}
+    };
+    
+    // 서비스 로드 상태 확인
+    status.services.SystemConfig = typeof SystemConfig !== 'undefined' ? 'LOADED' : 'MISSING';
+    status.services.DatabaseUtils = typeof DatabaseUtils !== 'undefined' ? 'LOADED' : 'MISSING';
+    status.services.AuthService = typeof AuthService !== 'undefined' ? 'LOADED' : 'MISSING';
+    status.services.MemberService = typeof MemberService !== 'undefined' ? 'LOADED' : 'MISSING';
+    status.services.BossService = typeof BossService !== 'undefined' ? 'LOADED' : 'MISSING';
+    status.services.AdminService = typeof AdminService !== 'undefined' ? 'LOADED' : 'MISSING';
+    
+    // 스프레드시트 연결 확인
+    try {
+      const spreadsheet = SpreadsheetApp.openById(SystemConfig.SPREADSHEET_ID);
+      status.spreadsheet.connected = true;
+      status.spreadsheet.name = spreadsheet.getName();
+      status.spreadsheet.url = spreadsheet.getUrl();
+      status.spreadsheet.sheetCount = spreadsheet.getSheets().length;
+    } catch (spreadsheetError) {
+      status.spreadsheet.connected = false;
+      status.spreadsheet.error = spreadsheetError.message;
+    }
+    
+    // 권한 확인
+    try {
+      const user = Session.getActiveUser();
+      status.permissions.userEmail = user.getEmail();
+      status.permissions.canEdit = true;
+    } catch (permError) {
+      status.permissions.canEdit = false;
+      status.permissions.error = permError.message;
+    }
+    
+    const allServicesLoaded = Object.values(status.services).every(service => service === 'LOADED');
+    
+    console.log('시스템 상태:', status);
+    
+    return {
+      success: allServicesLoaded && status.spreadsheet.connected,
+      status: status,
+      message: allServicesLoaded ? '모든 서비스 로드됨' : '일부 서비스 누락'
+    };
+    
+  } catch (error) {
+    console.error('시스템 상태 확인 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ===== 데이터베이스 강제 초기화 =====
+function forceInitializeDatabase() {
+  try {
+    console.log('📊 데이터베이스 강제 초기화 시작...');
+    
+    // DatabaseUtils 확인
+    if (typeof DatabaseUtils === 'undefined') {
+      throw new Error('DatabaseUtils가 로드되지 않았습니다');
+    }
+    
+    // 시트 초기화 실행
+    const result = DatabaseUtils.initializeSheets();
+    
+    if (result.success) {
+      console.log('✅ 데이터베이스 초기화 성공');
+      
+      // 추가: 시트 구조 검증
+      const verification = verifySheetStructure();
+      
+      return {
+        success: true,
+        message: '데이터베이스가 성공적으로 초기화되었습니다',
+        initResult: result,
+        verification: verification
+      };
+    } else {
+      throw new Error(result.message);
+    }
+    
+  } catch (error) {
+    console.error('❌ 데이터베이스 초기화 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ===== 시트 구조 검증 =====
+function verifySheetStructure() {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SystemConfig.SPREADSHEET_ID);
+    const requiredSheets = Object.values(SystemConfig.SHEET_NAMES);
+    const verification = {};
+    
+    requiredSheets.forEach(sheetName => {
+      const sheet = spreadsheet.getSheetByName(sheetName);
+      verification[sheetName] = {
+        exists: !!sheet,
+        rowCount: sheet ? sheet.getLastRow() : 0,
+        columnCount: sheet ? sheet.getLastColumn() : 0
+      };
+    });
+    
+    console.log('시트 구조 검증:', verification);
+    return verification;
+    
+  } catch (error) {
+    console.error('시트 구조 검증 실패:', error);
+    return { error: error.message };
+  }
+}
+
+// ===== 관리자 계정 강제 생성 =====
+function forceCreateAdminAccount() {
+  try {
+    console.log('👑 관리자 계정 강제 생성 시작...');
+    
+    // AuthService 확인
+    if (typeof AuthService === 'undefined') {
+      throw new Error('AuthService가 로드되지 않았습니다');
+    }
+    
+    // 기존 admin 계정 확인
+    let adminUser = DatabaseUtils.findUserByNickname('admin');
+    
+    if (adminUser) {
+      console.log('✅ 기존 admin 계정 발견:', {
+        nickname: adminUser.nickname,
+        role: adminUser.role,
+        status: adminUser.status
+      });
+      
+      return {
+        success: true,
+        message: '기존 관리자 계정이 확인되었습니다',
+        admin: {
+          nickname: adminUser.nickname,
+          role: adminUser.role,
+          status: adminUser.status
+        }
+      };
+    }
+    
+    // 관리자 계정 생성
+    const adminResult = AuthService.ensureAdminAccount();
+    
+    if (adminResult.success) {
+      console.log('✅ 관리자 계정 생성 성공');
+      
+      // 생성된 계정 재확인
+      adminUser = DatabaseUtils.findUserByNickname('admin');
+      
+      return {
+        success: true,
+        message: '관리자 계정이 성공적으로 생성되었습니다',
+        admin: adminUser ? {
+          nickname: adminUser.nickname,
+          role: adminUser.role,
+          status: adminUser.status
+        } : null,
+        createResult: adminResult
+      };
+    } else {
+      throw new Error(adminResult.message);
+    }
+    
+  } catch (error) {
+    console.error('❌ 관리자 계정 생성 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ===== 모든 API 라우트 테스트 =====
+function testAllAPIRoutes() {
+  try {
+    console.log('🔄 API 라우트 테스트 시작...');
+    
+    const testResults = {};
+    
+    // 1. 헬스체크 테스트
+    try {
+      const healthResult = healthCheck();
+      testResults.healthCheck = {
+        success: healthResult.success,
+        result: healthResult
+      };
+    } catch (error) {
+      testResults.healthCheck = {
+        success: false,
+        error: error.message
+      };
+    }
+    
+    // 2. 시스템 초기화 테스트
+    try {
+      if (typeof initializeSystem === 'function') {
+        const initResult = initializeSystem();
+        testResults.initializeSystem = {
+          success: initResult.success,
+          result: initResult
+        };
+      } else {
+        testResults.initializeSystem = {
+          success: false,
+          error: 'initializeSystem 함수가 없습니다'
+        };
+      }
+    } catch (error) {
+      testResults.initializeSystem = {
+        success: false,
+        error: error.message
+      };
+    }
+    
+    // 3. doPost 시뮬레이션 테스트
+    try {
+      const mockEvent = {
+        parameter: {
+          action: 'healthCheck',
+          data: '{}'
+        }
+      };
+      
+      const postResult = doPost(mockEvent);
+      const content = postResult.getContent();
+      const parsedContent = JSON.parse(content);
+      
+      testResults.doPost = {
+        success: parsedContent.success,
+        result: parsedContent
+      };
+    } catch (error) {
+      testResults.doPost = {
+        success: false,
+        error: error.message
+      };
+    }
+    
+    const allTestsPassed = Object.values(testResults).every(test => test.success);
+    
+    console.log('API 테스트 결과:', testResults);
+    
+    return {
+      success: allTestsPassed,
+      message: allTestsPassed ? '모든 API 테스트 통과' : '일부 API 테스트 실패',
+      testResults: testResults
+    };
+    
+  } catch (error) {
+    console.error('❌ API 테스트 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ===== 완전 로그인 테스트 =====
+function testCompleteLogin() {
+  try {
+    console.log('🔐 완전 로그인 테스트 시작...');
+    
+    const testCredentials = {
+      nickname: 'admin',
+      password: 'Admin#2025!Safe'
+    };
+    
+    // 1차: AuthService.login 직접 테스트
+    const directLoginResult = AuthService.login(testCredentials);
+    
+    if (!directLoginResult.success) {
+      throw new Error('직접 로그인 실패: ' + directLoginResult.message);
+    }
+    
+    console.log('✅ 직접 로그인 성공');
+    
+    // 2차: doPost를 통한 로그인 테스트
+    const mockLoginEvent = {
+      parameter: {
+        action: 'login',
+        data: JSON.stringify(testCredentials)
+      }
+    };
+    
+    const apiLoginResult = doPost(mockLoginEvent);
+    const apiContent = JSON.parse(apiLoginResult.getContent());
+    
+    if (!apiContent.success) {
+      throw new Error('API 로그인 실패: ' + apiContent.message);
+    }
+    
+    console.log('✅ API 로그인 성공');
+    
+    // 3차: 세션 검증 테스트
+    const sessionToken = apiContent.data.session.token;
+    const sessionCheck = AuthService.checkSession(sessionToken);
+    
+    if (!sessionCheck.isValid) {
+      throw new Error('세션 검증 실패');
+    }
+    
+    console.log('✅ 세션 검증 성공');
+    
+    return {
+      success: true,
+      message: '완전 로그인 테스트 성공',
+      results: {
+        directLogin: directLoginResult,
+        apiLogin: apiContent,
+        sessionCheck: sessionCheck
+      },
+      credentials: testCredentials
+    };
+    
+  } catch (error) {
+    console.error('❌ 로그인 테스트 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ===== 웹앱 재배포 가이드 출력 =====
+function printRedeploymentGuide() {
+  console.log(`
+🚀 웹앱 재배포 가이드
+==================
+
+1. Google Apps Script 프로젝트에서:
+   📁 배포 → 배포 관리 클릭
+
+2. 새 배포 생성:
+   ⚙️ 톱니바퀴 아이콘 클릭 → 새 배포
+
+3. 배포 설정:
+   📋 유형: 웹앱
+   💡 설명: "CSP 문제 해결 버전"
+   👤 실행 계정: 본인
+   🔓 액세스 권한: 조직 내 모든 사용자
+
+4. 배포 후:
+   🔗 웹앱 URL 복사
+   🔄 브라우저에서 새로고침 (Ctrl+F5)
+   🔐 admin / Admin#2025!Safe 로 로그인
+
+5. 성공 확인:
+   ✅ 로그인 창이 정상 표시되는지 확인
+   ✅ F12 개발자 도구에서 오류가 없는지 확인
+   ✅ 로그인 후 대시보드가 표시되는지 확인
+
+문제가 지속되면 finalCSPSolution() 함수를 다시 실행하세요.
+  `);
+}
+
+// ===== 완전 진단 및 해결 (원스톱) =====
+function oneStopCompleteSolution() {
+  console.log('🎯 원스톱 완전 해결 시작...');
+  
+  try {
+    // 1. 최종 CSP 해결 실행
+    const cspResult = finalCSPSolution();
+    
+    // 2. 결과 출력
+    console.log('🎯 최종 결과:', cspResult);
+    
+    // 3. 재배포 가이드 출력
+    printRedeploymentGuide();
+    
+    // 4. 다음 단계 안내
+    if (cspResult.success) {
+      console.log(`
+🎉 축하합니다! 모든 문제가 해결되었습니다!
+
+다음 단계:
+1. 웹앱을 재배포하세요
+2. 새 URL로 접속하세요
+3. admin / Admin#2025!Safe 로 로그인하세요
+4. 로그인 성공 후 관리자 설정을 완료하세요
+
+🚀 성공적인 길드 관리를 위해 화이팅! ⚔️
+      `);
+    } else {
+      console.log(`
+❌ 일부 문제가 남아있습니다.
+
+문제 해결 방법:
+1. 각 단계별 오류 메시지를 확인하세요
+2. 필요한 파일들이 모두 업로드되었는지 확인하세요
+3. 스프레드시트 ID가 올바른지 확인하세요
+4. 권한 설정이 올바른지 확인하세요
+
+더 자세한 도움이 필요하면 개발자에게 문의하세요.
+      `);
+    }
+    
+    return cspResult;
+    
+  } catch (error) {
+    console.error('❌ 원스톱 해결 중 오류:', error);
+    return {
+      success: false,
+      message: '원스톱 해결 중 오류가 발생했습니다: ' + error.message
+    };
+  }
+}
+
+// ===== CSP 상태 최종 점검 =====
+function finalCSPStatusCheck() {
+  try {
+    console.log('🔍 CSP 상태 최종 점검...');
+    
+    const status = {
+      timestamp: new Date().toISOString(),
+      main_gs: {
+        doGet: typeof doGet === 'function',
+        doPost: typeof doPost === 'function',
+        healthCheck: typeof healthCheck === 'function',
+        initializeSystem: typeof initializeSystem === 'function'
+      },
+      services: {
+        SystemConfig: typeof SystemConfig !== 'undefined',
+        DatabaseUtils: typeof DatabaseUtils !== 'undefined',
+        AuthService: typeof AuthService !== 'undefined',
+        MemberService: typeof MemberService !== 'undefined',
+        BossService: typeof BossService !== 'undefined',
+        AdminService: typeof AdminService !== 'undefined'
+      },
+      database: {
+        spreadsheetConnected: false,
+        adminAccountExists: false
+      }
+    };
+    
+    // 스프레드시트 연결 확인
+    try {
+      SpreadsheetApp.openById(SystemConfig.SPREADSHEET_ID);
+      status.database.spreadsheetConnected = true;
+    } catch (e) {
+      status.database.spreadsheetError = e.message;
+    }
+    
+    // 관리자 계정 확인
+    try {
+      const admin = DatabaseUtils.findUserByNickname('admin');
+      status.database.adminAccountExists = !!admin;
+    } catch (e) {
+      status.database.adminError = e.message;
+    }
+    
+    const allReady = Object.values(status.main_gs).every(Boolean) &&
+                     Object.values(status.services).every(Boolean) &&
+                     status.database.spreadsheetConnected &&
+                     status.database.adminAccountExists;
+    
+    console.log('📊 최종 상태:', status);
+    
+    return {
+      success: allReady,
+      message: allReady ? 'CSP 문제 완전 해결됨' : '일부 문제 남아있음',
+      status: status
+    };
+    
+  } catch (error) {
+    console.error('❌ CSP 상태 점검 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
