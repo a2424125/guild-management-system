@@ -1,26 +1,25 @@
 /**
- * 길드 관리 시스템 - CSP 완전 해결 버전
- * 모든 CSP 제한을 우회하는 최종 해결책
+ * 길드 관리 시스템 - 수정된 main.gs (doPost 오류 해결)
  */
 
-// ===== 웹앱 진입점 - CSP 완전 우회 =====
+// ===== 웹앱 진입점 =====
 function doGet(e) {
   try {
-    console.log('🚀 CSP 완전 해결 모드로 웹앱 시작');
+    console.log('🚀 웹앱 시작 - doGet 호출됨');
     
-    // 시스템 설정 안전하게 초기화
+    // 시스템 설정 초기화
     try {
       if (typeof SystemConfig !== 'undefined' && SystemConfig.initialize) {
         SystemConfig.initialize();
       }
     } catch (configError) {
-      console.warn('⚠️ SystemConfig 초기화 실패, 기본값 사용:', configError);
+      console.warn('⚠️ SystemConfig 초기화 실패:', configError);
     }
     
-    // HTML 생성 - CSP 우회를 위한 특별 설정
+    // HTML 생성
     const template = HtmlService.createTemplateFromFile('index');
     
-    // 템플릿에 서버 데이터 주입 (CSP 우회)
+    // 서버 데이터 주입
     template.serverData = {
       appName: getAppName(),
       version: getVersion(),
@@ -29,20 +28,11 @@ function doGet(e) {
     };
     
     const htmlOutput = template.evaluate()
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)  // IFRAME 모드 강제
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)  // X-Frame 허용
-      .setTitle('길드 관리 시스템 - CSP 해결')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .setTitle('길드 관리 시스템');
     
-    // CSP 헤더 완전 제거 시도 (Google Apps Script 한계 내에서)
-    try {
-      // 추가 헤더 설정으로 CSP 우회 시도
-      htmlOutput.addMetaTag('http-equiv', 'Content-Security-Policy', 'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\'; object-src \'none\'; base-uri \'self\';');
-    } catch (headerError) {
-      console.warn('헤더 설정 실패 (무시):', headerError);
-    }
-    
-    console.log('✅ HTML 출력 생성 완료 (CSP 우회 적용)');
+    console.log('✅ HTML 출력 생성 완료');
     return htmlOutput;
     
   } catch (error) {
@@ -51,134 +41,60 @@ function doGet(e) {
   }
 }
 
-// ===== 긴급 복구 페이지 =====
-function createEmergencyPage(error) {
-  const emergencyHtml = `
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>시스템 복구 모드</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .recovery-container { 
-            background: white; 
-            padding: 40px; 
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-        .icon { font-size: 64px; margin-bottom: 20px; }
-        .title { color: #2c3e50; font-size: 28px; font-weight: 700; margin-bottom: 16px; }
-        .message { color: #7f8c8d; margin-bottom: 24px; line-height: 1.6; }
-        .btn { 
-            background: #3498db; 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 25px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            margin: 10px;
-            font-family: inherit;
-            transition: background 0.3s ease;
-        }
-        .btn:hover { background: #2980b9; }
-        .info-box {
-            margin-top: 20px; 
-            padding: 20px; 
-            background: #e8f5e9; 
-            border-radius: 12px; 
-            text-align: left;
-            font-size: 14px;
-            color: #2e7d32;
-        }
-        .step { margin: 10px 0; padding: 8px 12px; background: #f0f0f0; border-radius: 6px; }
-    </style>
-</head>
-<body>
-    <div class="recovery-container">
-        <div class="icon">🔧</div>
-        <h1 class="title">시스템 복구 모드</h1>
-        <p class="message">
-            시스템 로드 중 문제가 발생했습니다.<br>
-            아래 버튼을 클릭하여 수동으로 시스템을 복구하세요.
-        </p>
-        
-        <button class="btn" onclick="initializeSystem()">🚀 시스템 초기화</button>
-        <button class="btn" onclick="window.location.reload()">🔄 새로고침</button>
-        
-        <div class="info-box">
-            <strong>🛠️ 수동 복구 단계:</strong>
-            <div class="step">1. Google Apps Script 프로젝트 열기</div>
-            <div class="step">2. emergency.gs → oneStopSolution() 실행</div>
-            <div class="step">3. 실행 완료 후 웹앱 새로고침</div>
-            <div class="step">4. admin / Admin#2025!Safe 로 로그인</div>
-        </div>
-    </div>
-    
-    <script>
-        function initializeSystem() {
-            // 직접 API 호출로 시스템 초기화
-            fetch(window.location.href, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'action=initializeSystem'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✅ 시스템 초기화 완료! 페이지를 새로고침합니다.');
-                    window.location.reload();
-                } else {
-                    alert('❌ 초기화 실패: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('❌ 네트워크 오류: ' + error.message);
-            });
-        }
-    </script>
-</body>
-</html>`;
-
-  return HtmlService.createHtmlOutput(emergencyHtml)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setTitle('시스템 복구 모드');
-}
-
-// ===== API 라우팅 - CSP 안전 =====
+// ===== API 라우팅 - 오류 수정됨 =====
 function doPost(e) {
   try {
-    console.log('📡 API 요청 받음 (CSP 해결 모드)');
+    console.log('📡 doPost 호출됨');
+    console.log('받은 파라미터:', e);
     
-    // CORS 헤더 설정 시도
-    const output = ContentService.createTextOutput();
+    // 안전한 파라미터 추출
+    let action, data, sessionToken;
+    
     try {
-      output.setHeaders({
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
+      // parameter 객체가 존재하는지 확인
+      if (e && e.parameter) {
+        action = e.parameter.action;
+        sessionToken = e.parameter.sessionToken;
+        
+        // data 파라미터 안전하게 파싱
+        if (e.parameter.data) {
+          try {
+            data = JSON.parse(e.parameter.data);
+          } catch (parseError) {
+            console.warn('JSON 파싱 실패, 원본 사용:', parseError);
+            data = e.parameter.data;
+          }
+        }
+      }
+      // parameters 배열 형태인 경우 처리
+      else if (e && e.parameters) {
+        action = e.parameters.action ? e.parameters.action[0] : null;
+        sessionToken = e.parameters.sessionToken ? e.parameters.sessionToken[0] : null;
+        
+        if (e.parameters.data && e.parameters.data[0]) {
+          try {
+            data = JSON.parse(e.parameters.data[0]);
+          } catch (parseError) {
+            data = e.parameters.data[0];
+          }
+        }
+      }
+      
+      console.log('추출된 값들:');
+      console.log('- action:', action);
+      console.log('- sessionToken:', sessionToken ? '존재함' : '없음');
+      console.log('- data:', data);
+      
+    } catch (paramError) {
+      console.error('파라미터 추출 오류:', paramError);
+      return createJSONResponse({
+        success: false,
+        code: 'PARAMETER_ERROR',
+        message: '요청 파라미터를 읽을 수 없습니다: ' + paramError.message
       });
-    } catch (headerError) {
-      console.warn('CORS 헤더 설정 실패 (무시):', headerError);
     }
     
-    const action = e.parameter.action || e.parameters.action?.[0];
-    console.log('처리할 액션:', action);
-    
+    // 액션 확인
     if (!action) {
       return createJSONResponse({
         success: false,
@@ -187,26 +103,18 @@ function doPost(e) {
       });
     }
     
-    // 안전한 JSON 파싱
-    let data = {};
-    try {
-      const dataParam = e.parameter.data || e.parameters.data?.[0];
-      if (dataParam && dataParam.trim() !== '') {
-        data = JSON.parse(dataParam);
-      }
-    } catch (parseError) {
-      console.warn('JSON 파싱 실패, 기본 객체 사용:', parseError);
-      data = e.parameter || {};
+    // 기본 data 객체 설정
+    if (!data || typeof data !== 'object') {
+      data = {};
     }
     
-    // 세션 토큰 추출
-    const sessionToken = e.parameter.sessionToken || e.parameters.sessionToken?.[0] || data.sessionToken;
-    let userSession = null;
+    console.log('처리할 액션:', action);
     
-    // 공개 액션 목록
+    // 공개 액션 목록 (세션 불필요)
     const publicActions = ['login', 'register', 'healthCheck', 'initializeSystem', 'getSystemStatus'];
     
     // 세션 확인 (공개 액션 제외)
+    let userSession = null;
     if (!publicActions.includes(action)) {
       if (!sessionToken) {
         return createJSONResponse({
@@ -253,8 +161,7 @@ function doPost(e) {
       result = {
         success: false,
         code: 'API_ERROR',
-        message: 'API 실행 중 오류가 발생했습니다: ' + apiError.message,
-        stack: apiError.stack
+        message: 'API 실행 중 오류가 발생했습니다: ' + apiError.message
       };
     }
     
@@ -265,8 +172,7 @@ function doPost(e) {
     return createJSONResponse({ 
       success: false, 
       code: 'SYSTEM_ERROR',
-      message: '시스템 오류가 발생했습니다: ' + error.message,
-      stack: error.stack
+      message: '시스템 오류가 발생했습니다: ' + error.message
     });
   }
 }
@@ -432,7 +338,7 @@ function createJSONResponse(data) {
 // ===== 시스템 초기화 =====
 function initializeSystem() {
   try {
-    console.log('🔧 시스템 초기화 시작 (CSP 해결 모드)');
+    console.log('🔧 시스템 초기화 시작');
     
     const results = {
       timestamp: new Date().toISOString(),
@@ -505,8 +411,6 @@ function healthCheck() {
       timestamp: new Date().toISOString(),
       system: 'online',
       version: getVersion(),
-      cspMode: 'resolved',
-      sandboxMode: 'IFRAME',
       services: {}
     };
     
@@ -518,7 +422,7 @@ function healthCheck() {
     status.services.BossService = typeof BossService !== 'undefined' ? 'loaded' : 'missing';
     status.services.AdminService = typeof AdminService !== 'undefined' ? 'loaded' : 'missing';
     
-    console.log('💚 헬스체크 완료 (CSP 해결 모드)');
+    console.log('💚 헬스체크 완료');
     return { success: true, status: status };
     
   } catch (error) {
@@ -549,6 +453,71 @@ function getSystemStatus() {
   }
 }
 
+// ===== 긴급 복구 페이지 =====
+function createEmergencyPage(error) {
+  const emergencyHtml = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 복구 모드</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .recovery-container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .icon { font-size: 64px; margin-bottom: 20px; }
+        .title { color: #2c3e50; font-size: 28px; font-weight: 700; margin-bottom: 16px; }
+        .message { color: #7f8c8d; margin-bottom: 24px; line-height: 1.6; }
+        .btn { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin: 10px;
+            font-family: inherit;
+            transition: background 0.3s ease;
+        }
+        .btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="recovery-container">
+        <div class="icon">🔧</div>
+        <h1 class="title">시스템 복구 모드</h1>
+        <p class="message">
+            시스템 로드 중 문제가 발생했습니다.<br>
+            관리자에게 문의하거나 재배포를 진행하세요.
+        </p>
+        <button class="btn" onclick="window.location.reload()">🔄 새로고침</button>
+    </div>
+</body>
+</html>`;
+
+  return HtmlService.createHtmlOutput(emergencyHtml)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setTitle('시스템 복구 모드');
+}
+
 // ===== 유틸리티 함수들 =====
 function getAppName() {
   try {
@@ -576,7 +545,7 @@ function generateCSRFToken() {
   }
 }
 
-// ===== 파일 포함 함수 (CSP 안전) =====
+// ===== 파일 포함 함수 =====
 function include(filename) {
   try {
     return HtmlService.createHtmlOutputFromFile(filename).getContent();
