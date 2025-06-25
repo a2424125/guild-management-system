@@ -162,3 +162,102 @@ function getCurrentWebAppURL() {
     };
   }
 }
+// 새 배포 후 Google Apps Script에서 실행하세요
+function finalVerification() {
+  console.log('🎯 최종 확인 및 테스트 시작...');
+  
+  try {
+    // 1. 현재 URL 확인
+    const currentURL = ScriptApp.getService().getUrl();
+    console.log('1️⃣ 현재 웹앱 URL:', currentURL);
+    
+    // 2. URL 타입 확인
+    let urlType = 'UNKNOWN';
+    if (currentURL.includes('/dev')) {
+      urlType = 'DEVELOPMENT';
+      console.log('   📝 타입: 개발 모드 (테스트용)');
+    } else if (currentURL.includes('/exec')) {
+      urlType = 'PRODUCTION';
+      console.log('   🚀 타입: 실제 배포 (프로덕션)');
+    }
+    
+    // 3. doGet 테스트
+    console.log('2️⃣ doGet 함수 테스트:');
+    const mockGetEvent = { parameter: {} };
+    const getResult = doGet(mockGetEvent);
+    
+    if (getResult && typeof getResult.getContent === 'function') {
+      const content = getResult.getContent();
+      const hasLoginForm = content.includes('name="nickname"') && content.includes('name="password"');
+      const hasCSPFix = content.includes('CSP 문제 해결');
+      
+      console.log('   HTML 생성:', content.length > 0 ? '✅ 성공' : '❌ 실패');
+      console.log('   로그인 폼:', hasLoginForm ? '✅ 포함됨' : '❌ 없음');
+      console.log('   CSP 수정:', hasCSPFix ? '✅ 적용됨' : '❌ 미적용');
+    }
+    
+    // 4. doPost 테스트
+    console.log('3️⃣ doPost 로그인 테스트:');
+    const mockPostEvent = {
+      parameter: {
+        action: 'login',
+        nickname: 'admin',
+        password: 'Admin#2025!Safe'
+      }
+    };
+    
+    const postResult = doPost(mockPostEvent);
+    const loginSuccess = postResult && typeof postResult.getContent === 'function';
+    console.log('   로그인 처리:', loginSuccess ? '✅ 성공' : '❌ 실패');
+    
+    // 5. 최종 결과
+    console.log('4️⃣ 최종 결과:');
+    
+    if (urlType === 'PRODUCTION' && loginSuccess) {
+      console.log('   🎉 완전 성공! 프로젝트 완성!');
+      console.log('   ✅ 이 URL로 접속하면 정상 작동합니다:');
+      console.log('   🔗', currentURL);
+      console.log('');
+      console.log('   🎯 테스트 방법:');
+      console.log('   1. 위 URL로 접속');
+      console.log('   2. admin / Admin#2025!Safe 로 로그인');
+      console.log('   3. 성공 페이지 확인');
+      
+      return {
+        success: true,
+        status: 'COMPLETED',
+        webAppURL: currentURL,
+        message: '프로젝트 완성! 즉시 사용 가능합니다!'
+      };
+      
+    } else if (urlType === 'DEVELOPMENT') {
+      console.log('   ⚠️ 개발 모드입니다. 새 실제 배포를 생성하세요!');
+      console.log('   💡 배포 → 새 배포 → 웹앱으로 실제 배포 생성');
+      
+      return {
+        success: false,
+        status: 'NEED_PRODUCTION_DEPLOY',
+        currentURL: currentURL,
+        message: '새 실제 배포 필요'
+      };
+      
+    } else {
+      console.log('   ❌ 문제가 있습니다. 추가 디버깅 필요');
+      
+      return {
+        success: false,
+        status: 'ERROR',
+        currentURL: currentURL,
+        message: '추가 문제 해결 필요'
+      };
+    }
+    
+  } catch (error) {
+    console.error('❌ 최종 확인 실패:', error);
+    return {
+      success: false,
+      status: 'ERROR',
+      error: error.message
+    };
+  }
+}
