@@ -120,3 +120,45 @@ function testCSPFix() {
     };
   }
 }
+// Google Apps Script에서 즉시 실행하세요
+function getCurrentWebAppURL() {
+  console.log('🔗 현재 웹앱 URL 확인 중...');
+  
+  try {
+    // 현재 배포된 웹앱 URL 가져오기
+    const url = ScriptApp.getService().getUrl();
+    
+    console.log('📍 현재 웹앱 URL:', url);
+    console.log('');
+    console.log('🎯 이 URL로 접속하세요:');
+    console.log(url);
+    console.log('');
+    
+    // URL이 /dev로 끝나는지 확인
+    if (url && url.includes('/dev')) {
+      console.log('⚠️ 현재 개발 모드 URL입니다.');
+      console.log('💡 실제 배포를 위해 새 배포를 생성하는 것을 권장합니다.');
+    } else if (url && url.includes('/exec')) {
+      console.log('✅ 실제 배포 URL입니다.');
+    }
+    
+    // 추가 정보
+    console.log('');
+    console.log('🔍 배포 정보:');
+    console.log('- 프로젝트 ID:', ScriptApp.getScriptId());
+    
+    return {
+      success: true,
+      currentURL: url,
+      projectId: ScriptApp.getScriptId(),
+      message: '이 URL로 접속하세요: ' + url
+    };
+    
+  } catch (error) {
+    console.error('❌ URL 확인 실패:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
