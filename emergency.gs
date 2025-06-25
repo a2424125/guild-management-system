@@ -1556,3 +1556,182 @@ function quickDiagnosis() {
   
   console.log('=== 진단 완료 ===');
 }
+// emergency.gs 파일 맨 끝에 추가하세요
+
+function checkMySpreadsheet() {
+  console.log('🔍 당신의 스프레드시트 전용 진단 시작...');
+  
+  const SHEET_ID = '1bJJQHzDkwdM_aYI5TNeg2LqURNJAuIc5-N8-PTgL2SM';
+  
+  try {
+    // 1. 스프레드시트 접근 테스트
+    console.log('📊 1. 스프레드시트 접근 테스트:');
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    console.log('  ✅ 접근 성공!');
+    console.log('  📝 시트 이름:', spreadsheet.getName());
+    
+    // 2. 기존 시트들 확인
+    const sheets = spreadsheet.getSheets();
+    console.log('  📋 현재 시트 개수:', sheets.length);
+    console.log('  📋 시트 이름들:');
+    sheets.forEach((sheet, index) => {
+      console.log(`    ${index + 1}. ${sheet.getName()} (${sheet.getLastRow()}행)`);
+    });
+    
+    // 3. 필요한 시트들이 있는지 확인
+    console.log('🔍 2. 필수 시트 확인:');
+    const requiredSheets = ['회원정보', '보스참여기록', '길드자금'];
+    let missingSheets = [];
+    
+    requiredSheets.forEach(sheetName => {
+      const sheet = spreadsheet.getSheetByName(sheetName);
+      if (sheet) {
+        console.log(`  ✅ ${sheetName}: 존재함 (${sheet.getLastRow()}행)`);
+      } else {
+        console.log(`  ❌ ${sheetName}: 없음`);
+        missingSheets.push(sheetName);
+      }
+    });
+    
+    // 4. 회원정보 시트 데이터 확인
+    console.log('👤 3. 회원 데이터 확인:');
+    const memberSheet = spreadsheet.getSheetByName('회원정보');
+    if (memberSheet) {
+      const data = memberSheet.getDataRange().getValues();
+      console.log('  📊 총 데이터 행수:', data.length);
+      
+      if (data.length > 0) {
+        console.log('  📋 헤더:', data[0]);
+        
+        // admin 계정 찾기
+        let adminFound = false;
+        for (let i = 1; i < data.length; i++) {
+          if (data[i][1] === 'admin') { // nickname이 admin인 행
+            adminFound = true;
+            console.log('  ✅ admin 계정 발견!');
+            console.log('    - 역할:', data[i][4]);
+            console.log('    - 상태:', data[i][5]);
+            break;
+          }
+        }
+        
+        if (!adminFound) {
+          console.log('  ❌ admin 계정 없음');
+        }
+      } else {
+        console.log('  ❌ 데이터 없음 (헤더만 있거나 완전히 비어있음)');
+      }
+    } else {
+      console.log('  ❌ 회원정보 시트가 없음');
+    }
+    
+    // 5. 해결책 제시
+    console.log('💡 4. 해결책:');
+    if (missingSheets.length > 0) {
+      console.log('  🔧 시트 초기화가 필요합니다.');
+      console.log('  → fixAllIssues() 함수를 실행하세요!');
+    } else {
+      console.log('  🔧 시트는 있지만 데이터 문제일 수 있습니다.');
+      console.log('  → resetAdminAccount() 함수를 실행하세요!');
+    }
+    
+  } catch (error) {
+    console.log('❌ 오류 발생:', error.message);
+    console.log('💡 가능한 원인:');
+    console.log('  1. 스프레드시트 접근 권한 없음');
+    console.log('  2. 다른 Google 계정으로 로그인됨');
+    console.log('  3. 스프레드시트가 삭제됨');
+  }
+}
+
+// 모든 문제를 한번에 해결하는 함수
+function fixAllIssues() {
+  console.log('🚀 모든 문제 자동 해결 시작...');
+  
+  try {
+    // 1. 시트 초기화
+    console.log('1️⃣ 시스템 시트 초기화...');
+    const initResult = DatabaseUtils.initializeSheets();
+    console.log('결과:', initResult.success ? '✅ 성공' : '❌ 실패');
+    if (!initResult.success) {
+      console.log('오류:', initResult.message);
+    }
+    
+    // 2. 관리자 계정 생성
+    console.log('2️⃣ 관리자 계정 생성...');
+    const adminResult = AuthService.ensureAdminAccount();
+    console.log('결과:', adminResult.success ? '✅ 성공' : '❌ 실패');
+    
+    // 3. 로그인 테스트
+    console.log('3️⃣ 로그인 테스트...');
+    const loginTest = AuthService.login({
+      nickname: 'admin',
+      password: 'Admin#2025!Safe'
+    });
+    console.log('결과:', loginTest.success ? '✅ 성공' : '❌ 실패');
+    
+    if (loginTest.success) {
+      console.log('🎉 모든 문제 해결 완료!');
+      console.log('🌐 이제 웹앱을 새로고침하고 로그인하세요!');
+      console.log('📋 로그인 정보:');
+      console.log('  - 닉네임: admin');
+      console.log('  - 비밀번호: Admin#2025!Safe');
+    } else {
+      console.log('❌ 여전히 문제 있음:', loginTest.message);
+      console.log('💡 수동으로 resetAdminAccount() 실행해보세요');
+    }
+    
+  } catch (error) {
+    console.log('❌ 자동 해결 실패:', error.message);
+    console.log('💡 파일이 모두 올바르게 업로드되었는지 확인하세요');
+  }
+}
+
+// 관리자 계정만 다시 생성
+function resetAdminAccount() {
+  console.log('👤 관리자 계정 재생성...');
+  
+  try {
+    const sheet = DatabaseUtils.getOrCreateSheet('회원정보');
+    
+    // 기존 admin 제거
+    const data = sheet.getDataRange().getValues();
+    if (data.length > 1) {
+      for (let i = data.length - 1; i >= 1; i--) {
+        if (data[i][1] === 'admin') {
+          sheet.deleteRow(i + 1);
+          console.log('기존 admin 계정 삭제됨');
+        }
+      }
+    }
+    
+    // 새 admin 생성
+    const now = new Date();
+    const adminData = [
+      SecurityUtils.generateUUID(),
+      'admin',
+      SecurityUtils.hashPassword('Admin#2025!Safe'),
+      'admin@example.com',
+      'ADMIN',
+      'ACTIVE',
+      now,
+      null,
+      now,
+      now
+    ];
+    
+    sheet.appendRow(adminData);
+    console.log('✅ 새 admin 계정 생성 완료!');
+    
+    // 테스트
+    const loginTest = AuthService.login({
+      nickname: 'admin',
+      password: 'Admin#2025!Safe'
+    });
+    
+    console.log('로그인 테스트:', loginTest.success ? '✅ 성공' : '❌ 실패');
+    
+  } catch (error) {
+    console.log('❌ 계정 재생성 실패:', error.message);
+  }
+}
