@@ -5,35 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>길드 관리 시스템</title>
     
-    <!-- 모든 외부 리소스 제거, 시스템 폰트만 사용 -->
+    <!-- CSP 완전 호환 스타일 - 외부 의존성 완전 제거 -->
     <style>
-        /* 시스템 폰트만 사용 */
+        /* CSS 변수와 시스템 폰트만 사용 */
         :root {
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --primary-color: #00BCD4;
-            --secondary-color: #FFD54F;
-            --accent-color: #FF6B6B;
-            --success-color: #4CAF50;
-            --warning-color: #FF9800;
-            --danger-color: #F44336;
-            --dark-color: #2C3E50;
-            --light-color: #ECF0F1;
+            --primary: #00BCD4;
+            --secondary: #FFD54F;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FF9800;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
             --white: #FFFFFF;
             --gray-100: #F8F9FA;
             --gray-200: #E9ECEF;
             --gray-300: #DEE2E6;
-            --gray-400: #CED4DA;
             --gray-500: #ADB5BD;
             --gray-600: #6C757D;
             --gray-700: #495057;
             --gray-800: #343A40;
-            --gray-900: #212529;
-            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-            --border-radius: 8px;
-            --border-radius-lg: 12px;
-            --border-radius-xl: 16px;
+            --radius: 8px;
         }
         
         * {
@@ -43,28 +35,31 @@
         }
         
         body {
-            font-family: var(--font-family);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.6;
             color: var(--gray-800);
-            background-color: var(--gray-100);
+            background: var(--gray-100);
         }
         
-        /* 텍스트 아이콘 사용 (SVG 대신) */
-        .text-icon {
-            display: inline-block;
-            font-weight: 700;
-            margin-right: 0.5rem;
-        }
+        /* 유틸리티 클래스 */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-white { color: var(--white); }
+        .bg-primary { background: var(--primary); }
+        .bg-success { background: var(--success); }
+        .bg-danger { background: var(--danger); }
+        .bg-warning { background: var(--warning); }
         
+        /* 컨테이너 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
         
-        /* Header */
+        /* 헤더 */
         .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            background: linear-gradient(135deg, var(--primary), var(--dark));
             color: var(--white);
             padding: 1rem 0;
             box-shadow: var(--shadow);
@@ -77,6 +72,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .logo {
@@ -92,19 +89,7 @@
             gap: 1rem;
         }
         
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        /* Navigation */
+        /* 내비게이션 */
         .nav {
             background: var(--white);
             padding: 1rem 0;
@@ -118,28 +103,24 @@
             flex-wrap: wrap;
         }
         
-        .nav-item {
-            margin: 0;
-        }
-        
         .nav-link {
             display: flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
             text-decoration: none;
             color: var(--gray-600);
-            border-radius: var(--border-radius);
+            border-radius: var(--radius);
             transition: all 0.3s ease;
             cursor: pointer;
         }
         
         .nav-link:hover,
         .nav-link.active {
-            background: var(--primary-color);
+            background: var(--primary);
             color: var(--white);
         }
         
-        /* Main Content */
+        /* 메인 콘텐츠 */
         .main {
             min-height: calc(100vh - 200px);
             padding: 2rem 0;
@@ -153,18 +134,13 @@
             display: block;
         }
         
-        /* Cards */
+        /* 카드 */
         .card {
             background: var(--white);
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            box-shadow: var(--shadow);
         }
         
         .card-header {
@@ -179,52 +155,34 @@
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: var(--dark-color);
+            color: var(--dark);
         }
         
-        /* Buttons */
+        /* 버튼 */
         .btn {
             display: inline-flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: var(--radius);
             font-weight: 500;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
             font-family: inherit;
+            text-align: center;
         }
         
-        .btn-primary {
-            background: var(--primary-color);
-            color: var(--white);
-        }
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-warning { background: var(--warning); color: var(--white); }
+        .btn-secondary { background: var(--gray-500); color: var(--white); }
         
-        .btn-primary:hover {
-            background: #0097A7;
+        .btn:hover {
             transform: translateY(-1px);
-        }
-        
-        .btn-success {
-            background: var(--success-color);
-            color: var(--white);
-        }
-        
-        .btn-warning {
-            background: var(--warning-color);
-            color: var(--white);
-        }
-        
-        .btn-danger {
-            background: var(--danger-color);
-            color: var(--white);
-        }
-        
-        .btn-secondary {
-            background: var(--gray-500);
-            color: var(--white);
+            opacity: 0.9;
         }
         
         .btn-sm {
@@ -232,7 +190,7 @@
             font-size: 0.8rem;
         }
         
-        /* Forms */
+        /* 폼 */
         .form {
             max-width: 500px;
             margin: 0 auto;
@@ -253,7 +211,7 @@
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--gray-300);
-            border-radius: var(--border-radius);
+            border-radius: var(--radius);
             font-size: 1rem;
             transition: border-color 0.3s ease;
             font-family: inherit;
@@ -261,15 +219,15 @@
         
         .form-control:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
         }
         
-        /* Tables */
+        /* 테이블 */
         .table-container {
             overflow-x: auto;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
         
         .table {
@@ -286,16 +244,16 @@
         }
         
         .table th {
-            background: var(--gray-50);
+            background: var(--gray-100);
             font-weight: 600;
             color: var(--gray-700);
         }
         
         .table tr:hover {
-            background: var(--gray-50);
+            background: var(--gray-100);
         }
         
-        /* Stats Cards */
+        /* 통계 카드 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -304,10 +262,10 @@
         }
         
         .stat-card {
-            background: linear-gradient(135deg, var(--primary-color), #0097A7);
+            background: linear-gradient(135deg, var(--primary), #0097A7);
             color: var(--white);
             padding: 1.5rem;
-            border-radius: var(--border-radius-lg);
+            border-radius: var(--radius);
             text-align: center;
         }
         
@@ -322,13 +280,14 @@
             opacity: 0.9;
         }
         
-        /* Login Page */
+        /* 로그인 페이지 */
         .login-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            padding: 20px;
         }
         
         .login-card {
@@ -336,8 +295,8 @@
             max-width: 400px;
             padding: 2rem;
             background: var(--white);
-            border-radius: var(--border-radius-xl);
-            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
         
         .login-header {
@@ -348,7 +307,7 @@
         .login-title {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--dark-color);
+            color: var(--dark);
             margin-bottom: 0.5rem;
         }
         
@@ -356,62 +315,10 @@
             color: var(--gray-600);
         }
         
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-        
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background: var(--white);
-            border-radius: var(--border-radius-lg);
-            padding: 2rem;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-500);
-        }
-        
-        /* Alerts */
+        /* 알림 */
         .alert {
             padding: 1rem;
-            border-radius: var(--border-radius);
+            border-radius: var(--radius);
             margin-bottom: 1rem;
             border: 1px solid transparent;
         }
@@ -434,7 +341,26 @@
             color: #856404;
         }
         
-        /* Loading */
+        /* 뱃지 */
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        
+        .badge-primary { color: #fff; background-color: var(--primary); }
+        .badge-secondary { color: #fff; background-color: var(--gray-500); }
+        .badge-success { color: #fff; background-color: var(--success); }
+        .badge-danger { color: #fff; background-color: var(--danger); }
+        .badge-warning { color: #212529; background-color: var(--warning); }
+        
+        /* 로딩 */
         .loading {
             display: inline-block;
             width: 20px;
@@ -450,50 +376,7 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Text utilities */
-        .text-center {
-            text-align: center;
-        }
-        
-        /* Badge styles */
-        .badge {
-            display: inline-block;
-            padding: 0.25em 0.4em;
-            font-size: 75%;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: 0.25rem;
-        }
-        
-        .badge-primary {
-            color: #fff;
-            background-color: var(--primary-color);
-        }
-        
-        .badge-secondary {
-            color: #fff;
-            background-color: var(--gray-500);
-        }
-        
-        .badge-success {
-            color: #fff;
-            background-color: var(--success-color);
-        }
-        
-        .badge-danger {
-            color: #fff;
-            background-color: var(--danger-color);
-        }
-        
-        .badge-warning {
-            color: #212529;
-            background-color: var(--warning-color);
-        }
-        
-        /* Responsive */
+        /* 반응형 */
         @media (max-width: 768px) {
             .nav-list {
                 flex-direction: column;
@@ -505,11 +388,6 @@
             
             .header-content {
                 flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .modal {
-                padding: 1rem;
             }
             
             .container {
@@ -517,21 +395,18 @@
             }
         }
         
-        /* Hide for non-logged in users */
+        /* 앱 컨테이너 숨김 */
         .app-container {
             display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
+    <!-- 로그인 페이지 -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h1 class="login-title">
-                    <span class="text-icon">⚔️</span>
-                    길드 관리 시스템
-                </h1>
+                <h1 class="login-title">⚔️ 길드 관리 시스템</h1>
                 <p class="login-subtitle">안전하고 편리한 게임 관리 플랫폼</p>
             </div>
             
@@ -547,98 +422,68 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
-                    <span class="text-icon">➜</span>
-                    로그인
+                    ➜ 로그인
                 </button>
                 
                 <button type="button" class="btn btn-secondary" style="width: 100%;" id="registerButton">
-                    <span class="text-icon">+</span>
-                    회원가입
+                    + 회원가입
                 </button>
             </form>
         </div>
     </div>
     
-    <!-- Main App -->
+    <!-- 메인 앱 -->
     <div id="appContainer" class="app-container">
-        <!-- Header -->
+        <!-- 헤더 -->
         <header class="header">
             <div class="container">
                 <div class="header-content">
                     <div class="logo">
-                        <span class="text-icon" style="font-size: 2rem;">⚔️</span>
-                        길드 관리 시스템
+                        ⚔️ 길드 관리 시스템
                     </div>
                     
                     <div class="user-info">
                         <span id="userNickname">사용자</span>
-                        <div class="user-avatar" id="userAvatar">U</div>
                         <button class="btn btn-secondary btn-sm" id="logoutButton">
-                            <span class="text-icon">←</span>
-                            로그아웃
+                            ← 로그아웃
                         </button>
                     </div>
                 </div>
             </div>
         </header>
         
-        <!-- Navigation -->
+        <!-- 네비게이션 -->
         <nav class="nav">
             <div class="container">
                 <ul class="nav-list">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-page="dashboard">
-                            <span class="text-icon">📊</span>
-                            대시보드
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="members">
-                            <span class="text-icon">👥</span>
-                            회원 관리
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="boss-records">
-                            <span class="text-icon">⚔️</span>
-                            보스 기록
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="statistics">
-                            <span class="text-icon">📈</span>
-                            통계
-                        </a>
-                    </li>
-                    <li class="nav-item" id="adminNav" style="display: none;">
-                        <a class="nav-link" data-page="admin">
-                            <span class="text-icon">⚙️</span>
-                            관리자
-                        </a>
-                    </li>
+                    <li><a class="nav-link active" data-page="dashboard">📊 대시보드</a></li>
+                    <li><a class="nav-link" data-page="members">👥 회원 관리</a></li>
+                    <li><a class="nav-link" data-page="boss-records">⚔️ 보스 기록</a></li>
+                    <li><a class="nav-link" data-page="statistics">📈 통계</a></li>
+                    <li id="adminNav" class="hidden"><a class="nav-link" data-page="admin">⚙️ 관리자</a></li>
                 </ul>
             </div>
         </nav>
         
-        <!-- Main Content -->
+        <!-- 메인 콘텐츠 -->
         <main class="main">
             <div class="container">
-                <!-- Dashboard Page -->
+                <!-- 대시보드 페이지 -->
                 <div id="dashboardPage" class="page active">
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value" id="totalMembers">0</div>
                             <div class="stat-label">총 회원 수</div>
                         </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, var(--success-color), #388E3C);">
+                        <div class="stat-card bg-success">
                             <div class="stat-value" id="activeMembers">0</div>
                             <div class="stat-label">활성 회원</div>
                         </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, var(--warning-color), #F57C00);">
+                        <div class="stat-card bg-warning">
                             <div class="stat-value" id="totalBossRecords">0</div>
                             <div class="stat-label">보스 기록</div>
                         </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-color), #E53935);">
+                        <div class="stat-card bg-danger">
                             <div class="stat-value" id="weeklyParticipation">0</div>
                             <div class="stat-label">주간 참여</div>
                         </div>
@@ -654,15 +499,12 @@
                     </div>
                 </div>
                 
-                <!-- Members Page -->
+                <!-- 회원 관리 페이지 -->
                 <div id="membersPage" class="page">
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">회원 관리</h2>
-                            <button class="btn btn-primary" id="addMemberButton">
-                                <span class="text-icon">+</span>
-                                회원 추가
-                            </button>
+                            <button class="btn btn-primary" id="addMemberButton">+ 회원 추가</button>
                         </div>
                         
                         <div style="margin-bottom: 1rem;">
@@ -692,15 +534,12 @@
                     </div>
                 </div>
                 
-                <!-- Boss Records Page -->
+                <!-- 보스 기록 페이지 -->
                 <div id="bossRecordsPage" class="page">
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">보스 참여 기록</h2>
-                            <button class="btn btn-primary" id="addBossRecordButton">
-                                <span class="text-icon">+</span>
-                                기록 추가
-                            </button>
+                            <button class="btn btn-primary" id="addBossRecordButton">+ 기록 추가</button>
                         </div>
                         
                         <div class="table-container">
@@ -725,7 +564,7 @@
                     </div>
                 </div>
                 
-                <!-- Statistics Page -->
+                <!-- 통계 페이지 -->
                 <div id="statisticsPage" class="page">
                     <div class="card">
                         <div class="card-header">
@@ -735,7 +574,7 @@
                     </div>
                 </div>
                 
-                <!-- Admin Page -->
+                <!-- 관리자 페이지 -->
                 <div id="adminPage" class="page">
                     <div class="card">
                         <div class="card-header">
@@ -746,28 +585,19 @@
                             <div class="card">
                                 <h3>보스 관리</h3>
                                 <p>게임의 보스들을 추가, 수정, 삭제할 수 있습니다.</p>
-                                <button class="btn btn-primary" id="manageBossButton">
-                                    <span class="text-icon">🐉</span>
-                                    보스 관리
-                                </button>
+                                <button class="btn btn-primary" id="manageBossButton">🐉 보스 관리</button>
                             </div>
                             
                             <div class="card">
                                 <h3>직업 관리</h3>
                                 <p>게임의 직업/클래스를 관리할 수 있습니다.</p>
-                                <button class="btn btn-primary" id="manageClassButton">
-                                    <span class="text-icon">⚡</span>
-                                    직업 관리
-                                </button>
+                                <button class="btn btn-primary" id="manageClassButton">⚡ 직업 관리</button>
                             </div>
                             
                             <div class="card">
                                 <h3>시스템 설정</h3>
                                 <p>게임 관련 설정을 변경할 수 있습니다.</p>
-                                <button class="btn btn-primary" id="systemSettingsButton">
-                                    <span class="text-icon">⚙️</span>
-                                    시스템 설정
-                                </button>
+                                <button class="btn btn-primary" id="systemSettingsButton">⚙️ 시스템 설정</button>
                             </div>
                         </div>
                     </div>
@@ -775,97 +605,38 @@
             </div>
         </main>
     </div>
-    
-    <!-- Modals -->
-    <div id="memberModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">회원 정보</h3>
-                <button class="modal-close" data-modal="memberModal">✕</button>
-            </div>
-            <form id="memberForm">
-                <div class="form-group">
-                    <label class="form-label">닉네임</label>
-                    <input type="text" class="form-control" id="memberNickname" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">이메일</label>
-                    <input type="email" class="form-control" id="memberEmail">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">역할</label>
-                    <select class="form-control" id="memberRole">
-                        <option value="MEMBER">일반 회원</option>
-                        <option value="OFFICER">임원</option>
-                        <option value="GUILD_MASTER">길드마스터</option>
-                    </select>
-                </div>
-                <div style="text-align: right;">
-                    <button type="button" class="btn btn-secondary" data-modal="memberModal">취소</button>
-                    <button type="submit" class="btn btn-primary">저장</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <div id="bossRecordModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">보스 기록 추가</h3>
-                <button class="modal-close" data-modal="bossRecordModal">✕</button>
-            </div>
-            <form id="bossRecordForm">
-                <div class="form-group">
-                    <label class="form-label">보스명</label>
-                    <select class="form-control" id="bossSelect" required>
-                        <option value="">보스를 선택하세요</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">참여자 (여러 명 선택 가능)</label>
-                    <div id="participantsList" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--gray-300); border-radius: var(--border-radius); padding: 0.5rem;">
-                        <!-- 동적으로 생성 -->
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">기록 날짜</label>
-                    <input type="datetime-local" class="form-control" id="recordDate" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">비고</label>
-                    <textarea class="form-control" id="recordNotes" rows="3"></textarea>
-                </div>
-                <div style="text-align: right;">
-                    <button type="button" class="btn btn-secondary" data-modal="bossRecordModal">취소</button>
-                    <button type="submit" class="btn btn-primary">저장</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
+    <!-- CSP 완전 안전 JavaScript -->
     <script>
-        // ===== 전역 변수들 (명시적 선언) =====
-        var currentUser = null;
-        var currentPage = 'dashboard';
-        var membersData = [];
-        var bossRecordsData = [];
-        var bossListData = [];
-        var sessionToken = null;
+        // 전역 변수
+        let currentUser = null;
+        let currentPage = 'dashboard';
+        let sessionToken = null;
+        let membersData = [];
+        let bossRecordsData = [];
         
-        // ===== 유틸리티 함수들 =====
+        // DOM 요소 참조 (CSP 안전)
+        const elements = {
+            loginPage: null,
+            appContainer: null,
+            loginForm: null,
+            userNickname: null,
+            logoutButton: null,
+            adminNav: null
+        };
+        
+        // 유틸리티 함수들
         function showAlert(message, type) {
             type = type || 'success';
-            var alertDiv = document.createElement('div');
+            const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-' + type;
             alertDiv.textContent = message;
             
-            var container = document.querySelector('.container');
+            const container = document.querySelector('.container');
             if (container) {
                 container.insertBefore(alertDiv, container.firstChild);
-                
-                // setTimeout 안전 사용
                 setTimeout(function() {
-                    if (alertDiv.parentNode) {
+                    if (alertDiv && alertDiv.parentNode) {
                         alertDiv.parentNode.removeChild(alertDiv);
                     }
                 }, 5000);
@@ -874,35 +645,41 @@
         
         function formatDate(dateString) {
             if (!dateString) return '-';
-            var date = new Date(dateString);
+            const date = new Date(dateString);
             return date.toLocaleDateString('ko-KR');
         }
         
         function formatDateTime(dateString) {
             if (!dateString) return '-';
-            var date = new Date(dateString);
+            const date = new Date(dateString);
             return date.toLocaleString('ko-KR');
         }
         
-        // ===== Google Apps Script API 호출 =====
+        // Google Apps Script API 호출 (CSP 안전)
         function apiCall(action, data, callback) {
             data = data || {};
             
-            // google.script.run 사용 (Google Apps Script 표준 방식)
             if (typeof google !== 'undefined' && google.script && google.script.run) {
+                // google.script.run 사용 (가장 안전한 방법)
                 google.script.run
-                    .withSuccessHandler(callback)
+                    .withSuccessHandler(function(result) {
+                        if (callback) callback(result);
+                    })
                     .withFailureHandler(function(error) {
                         console.error('API 호출 오류:', error);
                         showAlert('서버 오류가 발생했습니다.', 'danger');
-                        if (callback) {
-                            callback({ success: false, error: error.message });
-                        }
+                        if (callback) callback({ success: false, error: error.message });
                     })
-                    .doPost({ parameter: { action: action, data: JSON.stringify(data), sessionToken: sessionToken } });
+                    .doPost({ 
+                        parameter: { 
+                            action: action, 
+                            data: JSON.stringify(data),
+                            sessionToken: sessionToken 
+                        } 
+                    });
             } else {
-                // 폴백: FormData 사용
-                var formData = new FormData();
+                // 폴백: FormData 방식
+                const formData = new FormData();
                 formData.append('action', action);
                 formData.append('data', JSON.stringify(data));
                 if (sessionToken) {
@@ -917,136 +694,30 @@
                     return response.json();
                 })
                 .then(function(result) {
-                    if (callback) {
-                        callback(result);
-                    }
+                    if (callback) callback(result);
                 })
                 .catch(function(error) {
                     console.error('API 호출 오류:', error);
                     showAlert('서버 오류가 발생했습니다.', 'danger');
-                    if (callback) {
-                        callback({ success: false, error: error.message });
-                    }
+                    if (callback) callback({ success: false, error: error.message });
                 });
             }
         }
         
-        // ===== 이벤트 리스너 설정 =====
-        function setupEventListeners() {
-            // 로그인 폼
-            var loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-            
-            // 회원가입 버튼
-            var registerButton = document.getElementById('registerButton');
-            if (registerButton) {
-                registerButton.addEventListener('click', showRegisterForm);
-            }
-            
-            // 로그아웃 버튼
-            var logoutButton = document.getElementById('logoutButton');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', logout);
-            }
-            
-            // 네비게이션 링크들
-            document.querySelectorAll('.nav-link').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var pageId = this.getAttribute('data-page');
-                    if (pageId) {
-                        showPage(pageId);
-                    }
-                });
-            });
-            
-            // 모달 닫기
-            document.querySelectorAll('.modal-close, [data-modal]').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var modalId = this.getAttribute('data-modal');
-                    if (modalId) {
-                        closeModal(modalId);
-                    }
-                });
-            });
-            
-            // 모달 배경 클릭
-            document.querySelectorAll('.modal').forEach(function(modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        this.classList.remove('active');
-                    }
-                });
-            });
-            
-            // 페이지별 버튼들
-            setupPageButtons();
-            
-            // 검색 기능
-            var memberSearch = document.getElementById('memberSearch');
-            if (memberSearch) {
-                memberSearch.addEventListener('input', function(e) {
-                    var searchTerm = e.target.value.toLowerCase();
-                    var filteredMembers = membersData.filter(function(member) {
-                        return member.nickname.toLowerCase().includes(searchTerm) ||
-                               (member.email && member.email.toLowerCase().includes(searchTerm));
-                    });
-                    displayMembers(filteredMembers);
-                });
-            }
-        }
-        
-        function setupPageButtons() {
-            // 회원 추가
-            var addMemberButton = document.getElementById('addMemberButton');
-            if (addMemberButton) {
-                addMemberButton.addEventListener('click', function() {
-                    openMemberModal();
-                });
-            }
-            
-            // 보스 기록 추가
-            var addBossRecordButton = document.getElementById('addBossRecordButton');
-            if (addBossRecordButton) {
-                addBossRecordButton.addEventListener('click', function() {
-                    openBossRecordModal();
-                });
-            }
-            
-            // 관리자 버튼들
-            var manageBossButton = document.getElementById('manageBossButton');
-            if (manageBossButton) {
-                manageBossButton.addEventListener('click', function() {
-                    showAlert('보스 관리 기능은 준비 중입니다.', 'warning');
-                });
-            }
-            
-            var manageClassButton = document.getElementById('manageClassButton');
-            if (manageClassButton) {
-                manageClassButton.addEventListener('click', function() {
-                    showAlert('직업 관리 기능은 준비 중입니다.', 'warning');
-                });
-            }
-            
-            var systemSettingsButton = document.getElementById('systemSettingsButton');
-            if (systemSettingsButton) {
-                systemSettingsButton.addEventListener('click', function() {
-                    showAlert('시스템 설정 기능은 준비 중입니다.', 'warning');
-                });
-            }
-        }
-        
-        // ===== 인증 관련 함수들 =====
+        // 인증 함수들
         function handleLogin(event) {
             event.preventDefault();
             
-            var nickname = document.getElementById('loginNickname').value;
-            var password = document.getElementById('loginPassword').value;
+            const nickname = document.getElementById('loginNickname').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!nickname || !password) {
+                showAlert('닉네임과 비밀번호를 입력해주세요.', 'danger');
+                return;
+            }
             
             apiCall('login', { nickname: nickname, password: password }, function(result) {
-                if (result.success) {
+                if (result && result.success) {
                     currentUser = result.data.user;
                     sessionToken = result.data.session.token;
                     
@@ -1087,59 +758,53 @@
                 console.warn('세션 정리 실패:', e);
             }
             
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('appContainer').style.display = 'none';
+            elements.loginPage.style.display = 'flex';
+            elements.appContainer.style.display = 'none';
             
-            var loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.reset();
+            if (elements.loginForm) {
+                elements.loginForm.reset();
             }
         }
         
         function showMainApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
+            elements.loginPage.style.display = 'none';
+            elements.appContainer.style.display = 'block';
             
             if (currentUser) {
-                var userNickname = document.getElementById('userNickname');
-                var userAvatar = document.getElementById('userAvatar');
-                
-                if (userNickname) {
-                    userNickname.textContent = currentUser.nickname;
-                }
-                if (userAvatar) {
-                    userAvatar.textContent = currentUser.nickname.charAt(0).toUpperCase();
+                if (elements.userNickname) {
+                    elements.userNickname.textContent = currentUser.nickname;
                 }
                 
                 if (currentUser.role === 'ADMIN' || currentUser.role === 'GUILD_MASTER') {
-                    var adminNav = document.getElementById('adminNav');
-                    if (adminNav) {
-                        adminNav.style.display = 'block';
+                    if (elements.adminNav) {
+                        elements.adminNav.classList.remove('hidden');
                     }
                 }
             }
         }
         
-        function showRegisterForm() {
-            showAlert('회원가입 기능은 관리자에게 문의하세요.', 'warning');
-        }
-        
-        // ===== 네비게이션 함수들 =====
+        // 페이지 네비게이션
         function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(function(page) {
+            // 모든 페이지 숨기기
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(function(page) {
                 page.classList.remove('active');
             });
             
-            document.querySelectorAll('.nav-link').forEach(function(link) {
+            // 모든 네비게이션 링크 비활성화
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(function(link) {
                 link.classList.remove('active');
             });
             
-            var targetPage = document.getElementById(pageId + 'Page');
+            // 대상 페이지 활성화
+            const targetPage = document.getElementById(pageId + 'Page');
             if (targetPage) {
                 targetPage.classList.add('active');
             }
             
-            var targetNav = document.querySelector('.nav-link[data-page="' + pageId + '"]');
+            // 대상 네비게이션 링크 활성화
+            const targetNav = document.querySelector('.nav-link[data-page="' + pageId + '"]');
             if (targetNav) {
                 targetNav.classList.add('active');
             }
@@ -1166,13 +831,13 @@
             }
         }
         
-        // ===== 데이터 로딩 함수들 =====
+        // 데이터 로딩 함수들
         function loadDashboard() {
             apiCall('getMembers', {}, function(result) {
-                if (result.success) {
-                    var data = result.data;
-                    var totalMembersEl = document.getElementById('totalMembers');
-                    var activeMembersEl = document.getElementById('activeMembers');
+                if (result && result.success) {
+                    const data = result.data;
+                    const totalMembersEl = document.getElementById('totalMembers');
+                    const activeMembersEl = document.getElementById('activeMembers');
                     
                     if (totalMembersEl) {
                         totalMembersEl.textContent = data.totalCount || 0;
@@ -1184,19 +849,19 @@
             });
             
             apiCall('getBossRecords', {}, function(result) {
-                if (result.success) {
-                    var totalRecordsEl = document.getElementById('totalBossRecords');
-                    var weeklyParticipationEl = document.getElementById('weeklyParticipation');
+                if (result && result.success) {
+                    const totalRecordsEl = document.getElementById('totalBossRecords');
+                    const weeklyParticipationEl = document.getElementById('weeklyParticipation');
                     
                     if (totalRecordsEl) {
                         totalRecordsEl.textContent = result.data.totalCount || 0;
                     }
                     
                     if (weeklyParticipationEl && result.data.records) {
-                        var weekAgo = new Date();
+                        const weekAgo = new Date();
                         weekAgo.setDate(weekAgo.getDate() - 7);
                         
-                        var weeklyCount = result.data.records.filter(function(record) {
+                        const weeklyCount = result.data.records.filter(function(record) {
                             return new Date(record.recordDate) >= weekAgo;
                         }).length;
                         
@@ -1211,15 +876,15 @@
         }
         
         function displayRecentActivity(records) {
-            var container = document.getElementById('recentActivity');
+            const container = document.getElementById('recentActivity');
             if (!container) return;
             
-            if (records.length === 0) {
+            if (!records || records.length === 0) {
                 container.innerHTML = '<p>최근 활동이 없습니다.</p>';
                 return;
             }
             
-            var html = records.map(function(record) {
+            const html = records.map(function(record) {
                 return '<div style="padding: 0.75rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">' +
                     '<div>' +
                         '<strong>' + (record.participantNickname || '') + '</strong>님이 ' +
@@ -1234,7 +899,7 @@
         
         function loadMembers() {
             apiCall('getMembers', {}, function(result) {
-                if (result.success) {
+                if (result && result.success) {
                     membersData = result.data.members || [];
                     displayMembers(membersData);
                 } else {
@@ -1244,36 +909,26 @@
         }
         
         function displayMembers(members) {
-            var tbody = document.getElementById('membersTableBody');
+            const tbody = document.getElementById('membersTableBody');
             if (!tbody) return;
             
-            if (members.length === 0) {
+            if (!members || members.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">회원이 없습니다.</td></tr>';
                 return;
             }
             
-            var html = members.map(function(member) {
+            const html = members.map(function(member) {
                 return '<tr>' +
                     '<td>' + (member.nickname || '') + '</td>' +
                     '<td><span class="badge badge-' + getRoleBadgeClass(member.role) + '">' + getRoleDisplayName(member.role) + '</span></td>' +
                     '<td>' + formatDate(member.joinDate) + '</td>' +
                     '<td>' + (member.lastLoginFormatted || '없음') + '</td>' +
                     '<td><span class="badge badge-' + (member.isActive ? 'success' : 'secondary') + '">' + (member.isActive ? '활성' : '비활성') + '</span></td>' +
-                    '<td>' +
-                        '<button class="btn btn-sm btn-primary" data-member-id="' + (member.id || '') + '" data-action="edit">✏️</button>' +
-                    '</td>' +
+                    '<td><button class="btn btn-sm btn-primary" data-member-id="' + (member.id || '') + '">✏️</button></td>' +
                 '</tr>';
             }).join('');
             
             tbody.innerHTML = html;
-            
-            // 편집 버튼 이벤트
-            tbody.querySelectorAll('button[data-action="edit"]').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var memberId = this.getAttribute('data-member-id');
-                    editMember(memberId);
-                });
-            });
         }
         
         function getRoleBadgeClass(role) {
@@ -1297,7 +952,7 @@
         
         function loadBossRecords() {
             apiCall('getBossRecords', {}, function(result) {
-                if (result.success) {
+                if (result && result.success) {
                     bossRecordsData = result.data.records || [];
                     displayBossRecords(bossRecordsData);
                 } else {
@@ -1307,36 +962,26 @@
         }
         
         function displayBossRecords(records) {
-            var tbody = document.getElementById('bossRecordsTableBody');
+            const tbody = document.getElementById('bossRecordsTableBody');
             if (!tbody) return;
             
-            if (records.length === 0) {
+            if (!records || records.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">보스 기록이 없습니다.</td></tr>';
                 return;
             }
             
-            var html = records.map(function(record) {
+            const html = records.map(function(record) {
                 return '<tr>' +
                     '<td>' + (record.bossName || '') + '</td>' +
                     '<td>' + (record.participantNickname || '') + '</td>' +
                     '<td>' + (record.participantClass || '-') + '</td>' +
                     '<td>' + (record.contribution ? record.contribution.toLocaleString() : '0') + '</td>' +
                     '<td>' + formatDateTime(record.recordDate) + '</td>' +
-                    '<td>' +
-                        '<button class="btn btn-sm btn-primary" data-record-id="' + (record.id || '') + '" data-action="edit">✏️</button>' +
-                    '</td>' +
+                    '<td><button class="btn btn-sm btn-primary" data-record-id="' + (record.id || '') + '">✏️</button></td>' +
                 '</tr>';
             }).join('');
             
             tbody.innerHTML = html;
-            
-            // 편집 버튼 이벤트
-            tbody.querySelectorAll('button[data-action="edit"]').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var recordId = this.getAttribute('data-record-id');
-                    editBossRecord(recordId);
-                });
-            });
         }
         
         function loadStatistics() {
@@ -1347,71 +992,118 @@
             // TODO: 관리자 페이지 로딩 구현
         }
         
-        // ===== 모달 관련 함수들 =====
-        function openModal(modalId) {
-            var modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.add('active');
+        // 이벤트 리스너 설정 (CSP 안전)
+        function setupEventListeners() {
+            // DOM 요소 참조 설정
+            elements.loginPage = document.getElementById('loginPage');
+            elements.appContainer = document.getElementById('appContainer');
+            elements.loginForm = document.getElementById('loginForm');
+            elements.userNickname = document.getElementById('userNickname');
+            elements.logoutButton = document.getElementById('logoutButton');
+            elements.adminNav = document.getElementById('adminNav');
+            
+            // 로그인 폼
+            if (elements.loginForm) {
+                elements.loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            // 회원가입 버튼
+            const registerButton = document.getElementById('registerButton');
+            if (registerButton) {
+                registerButton.addEventListener('click', function() {
+                    showAlert('회원가입 기능은 관리자에게 문의하세요.', 'warning');
+                });
+            }
+            
+            // 로그아웃 버튼
+            if (elements.logoutButton) {
+                elements.logoutButton.addEventListener('click', logout);
+            }
+            
+            // 네비게이션 링크들
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    if (pageId) {
+                        showPage(pageId);
+                    }
+                });
+            });
+            
+            // 검색 기능
+            const memberSearch = document.getElementById('memberSearch');
+            if (memberSearch) {
+                memberSearch.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredMembers = membersData.filter(function(member) {
+                        return member.nickname.toLowerCase().includes(searchTerm) ||
+                               (member.email && member.email.toLowerCase().includes(searchTerm));
+                    });
+                    displayMembers(filteredMembers);
+                });
+            }
+            
+            // 기타 버튼들
+            const addMemberButton = document.getElementById('addMemberButton');
+            if (addMemberButton) {
+                addMemberButton.addEventListener('click', function() {
+                    showAlert('회원 추가 기능은 준비 중입니다.', 'warning');
+                });
+            }
+            
+            const addBossRecordButton = document.getElementById('addBossRecordButton');
+            if (addBossRecordButton) {
+                addBossRecordButton.addEventListener('click', function() {
+                    showAlert('보스 기록 추가 기능은 준비 중입니다.', 'warning');
+                });
+            }
+            
+            const manageBossButton = document.getElementById('manageBossButton');
+            if (manageBossButton) {
+                manageBossButton.addEventListener('click', function() {
+                    showAlert('보스 관리 기능은 준비 중입니다.', 'warning');
+                });
+            }
+            
+            const manageClassButton = document.getElementById('manageClassButton');
+            if (manageClassButton) {
+                manageClassButton.addEventListener('click', function() {
+                    showAlert('직업 관리 기능은 준비 중입니다.', 'warning');
+                });
+            }
+            
+            const systemSettingsButton = document.getElementById('systemSettingsButton');
+            if (systemSettingsButton) {
+                systemSettingsButton.addEventListener('click', function() {
+                    showAlert('시스템 설정 기능은 준비 중입니다.', 'warning');
+                });
             }
         }
         
-        function closeModal(modalId) {
-            var modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        }
-        
-        function openMemberModal(memberId) {
-            openModal('memberModal');
-            // TODO: 회원 정보 로드 및 표시
-        }
-        
-        function openBossRecordModal() {
-            openModal('bossRecordModal');
-            // TODO: 보스 목록 로드
-        }
-        
-        function editMember(memberId) {
-            console.log('회원 수정:', memberId);
-            // TODO: 회원 수정 구현
-        }
-        
-        function editBossRecord(recordId) {
-            console.log('보스 기록 수정:', recordId);
-            // TODO: 보스 기록 수정 구현
-        }
-        
-        // ===== 초기화 함수 =====
+        // 초기화 함수
         function initializeApp() {
-            console.log('앱 초기화 시작');
+            console.log('앱 초기화 시작 (CSP 안전 모드)');
             
             // 이벤트 리스너 설정
             setupEventListeners();
             
-            // 기본 날짜 설정
-            var recordDateInput = document.getElementById('recordDate');
-            if (recordDateInput) {
-                var now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                recordDateInput.value = now.toISOString().slice(0, 16);
-            }
-            
             // 저장된 세션 확인
             try {
-                var savedSession = sessionStorage.getItem('userSession');
-                var savedUser = sessionStorage.getItem('currentUser');
+                const savedSession = sessionStorage.getItem('userSession');
+                const savedUser = sessionStorage.getItem('currentUser');
                 
                 if (savedSession && savedUser) {
-                    var sessionData = JSON.parse(savedSession);
-                    var userData = JSON.parse(savedUser);
+                    const sessionData = JSON.parse(savedSession);
+                    const userData = JSON.parse(savedUser);
                     
                     if (sessionData.token && userData.nickname) {
                         sessionToken = sessionData.token;
                         currentUser = userData;
                         
                         apiCall('healthCheck', {}, function(result) {
-                            if (result.success) {
+                            if (result && result.success) {
                                 showMainApp();
                                 loadDashboard();
                             } else {
@@ -1424,10 +1116,10 @@
                 console.warn('세션 복구 실패:', e);
             }
             
-            console.log('앱 초기화 완료');
+            console.log('앱 초기화 완료 (CSP 호환)');
         }
         
-        // ===== DOM 로드 완료 시 초기화 =====
+        // DOM 로드 완료 시 초기화
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeApp);
         } else {
